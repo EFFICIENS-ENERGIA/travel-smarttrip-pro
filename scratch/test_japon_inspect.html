@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+  <iframe id="f" src="../travel_dashboard.html" style="width:1200px;height:800px;"></iframe>
+  <pre id="output"></pre>
+  <script>
+    const f = document.getElementById('f');
+    f.onload = () => {
+      setTimeout(async () => {
+        const out = document.getElementById('output');
+        const win = f.contentWindow;
+        const doc = f.contentDocument;
+
+        function runSearch(dest) {
+          const destInput = doc.getElementById('destInput');
+          destInput.value = dest;
+          // Trigger search
+          if (win.onCriteriaChanged) win.onCriteriaChanged();
+          if (win.renderPlatformCards) win.renderPlatformCards();
+          
+          const curr = win.USER_CURRENCY;
+          const currRate = win.CURRENCY_RATES ? win.CURRENCY_RATES[curr] : null;
+          const badge = doc.getElementById('priceRangeBadge')?.innerText;
+          const minInput = doc.getElementById('minPriceInput')?.value;
+          const maxInput = doc.getElementById('maxPriceInput')?.value;
+
+          const cards = Array.from(doc.querySelectorAll('#platformsContainer [class*="rounded-xl"]')).slice(0, 4);
+          const cardData = cards.map(c => {
+            const name = c.querySelector('h4')?.innerText;
+            const price = c.querySelector('.text-emerald-700')?.innerText;
+            const total = c.querySelector('.text-slate-600')?.innerText;
+            const ficheLink = Array.from(c.querySelectorAll('a')).find(a => a.innerText.includes('Fiche'))?.href;
+            const directLink = Array.from(c.querySelectorAll('a')).find(a => a.innerText.includes('Voir'))?.href;
+            return { name, price, total, ficheLink, directLink };
+          });
+
+          // Also check getPlatformTop4Listings directly
+          const directOffers = win.getPlatformTop4Listings('googletravel', dest, '2026-10-12', '2026-10-15', 2, 40, 180, '', 5);
+
+          return {
+            dest,
+            currency: curr,
+            rate: currRate,
+            badge,
+            minInput,
+            maxInput,
+            cardData,
+            directOffers: directOffers.map(o => ({
+              name: o.name,
+              price: o.price,
+              totalPrice: o.totalPrice,
+              googleUrl: o.googleUrl,
+              directUrl: o.directUrl,
+              inBudget: o.inBudget
+            }))
+          };
+        }
+
+        const resJapon = runSearch('Japon');
+        const resTokyo = runSearch('Tokyo');
+
+        out.innerText = JSON.stringify({ resJapon, resTokyo }, null, 2);
+      }, 1500);
+    };
+  </script>
+</body>
+</html>

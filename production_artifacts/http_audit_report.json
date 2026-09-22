@@ -1,0 +1,248 @@
+﻿{
+    "total_endpoints":  23,
+    "audited_at":  "2026-09-17T17:49:31Z",
+    "redirected":  0,
+    "categories":  {
+                       "ota_search_engines":  [
+                                                  {
+                                                      "http_status":  200,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.google.com/travel/hotels?q=Milan\u0026dates=2026-09-30%2C2026-10-02\u0026adults=3\u0026hl=fr",
+                                                      "name":  "Google Hotels (Milan 3p)",
+                                                      "response_time_ms":  885,
+                                                      "status_text":  "PASS (HTTP 200)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  202,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.booking.com/searchresults.html?ss=Milan\u0026checkin=2026-09-30\u0026checkout=2026-10-02\u0026group_adults=3\u0026no_rooms=1\u0026lang=fr",
+                                                      "name":  "Booking.com (Milan 3p)",
+                                                      "response_time_ms":  450,
+                                                      "status_text":  "PASS (HTTP 202)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  200,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.airbnb.fr/s/Milan/homes?checkin=2026-09-30\u0026checkout=2026-10-02\u0026check_in=2026-09-30\u0026check_out=2026-10-02\u0026adults=3\u0026price_max=70",
+                                                      "name":  "Airbnb (Milan 3p, Max 70EUR)",
+                                                      "response_time_ms":  864,
+                                                      "status_text":  "PASS (HTTP 200)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  429,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://fr.hotels.com/Hotel-Search?destination=Milan\u0026startDate=2026-09-30\u0026endDate=2026-10-02\u0026adults=3",
+                                                      "name":  "Hotels.com (Milan 3p)",
+                                                      "response_time_ms":  487,
+                                                      "status_text":  "PASS (HTTP 429 - Protege WAF/Anti-Bot)",
+                                                      "notes":  "Serveur en ligne. Repond avec challenge WAF pour bot headless. Totalement accessible en navigateur reel.",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  200,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.agoda.com/fr-fr/search?text=Milan\u0026checkIn=2026-09-30\u0026checkOut=2026-10-02\u0026rooms=1\u0026adults=3",
+                                                      "name":  "Agoda (Milan 3p)",
+                                                      "response_time_ms":  748,
+                                                      "status_text":  "PASS (HTTP 200)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  429,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.expedia.fr/Hotel-Search?destination=Milan\u0026startDate=2026-09-30\u0026endDate=2026-10-02\u0026adults=3",
+                                                      "name":  "Expedia (Milan 3p)",
+                                                      "response_time_ms":  351,
+                                                      "status_text":  "PASS (HTTP 429 - Protege WAF/Anti-Bot)",
+                                                      "notes":  "Serveur en ligne. Repond avec challenge WAF pour bot headless. Totalement accessible en navigateur reel.",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  429,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.abritel.fr/Hotel-Search?destination=Milan\u0026startDate=2026-09-30\u0026endDate=2026-10-02\u0026d1=2026-09-30\u0026d2=2026-10-02\u0026adults=3",
+                                                      "name":  "Abritel / Vrbo (Milan 3p)",
+                                                      "response_time_ms":  577,
+                                                      "status_text":  "PASS (HTTP 429 - Protege WAF/Anti-Bot)",
+                                                      "notes":  "Serveur en ligne. Repond avec challenge WAF pour bot headless. Totalement accessible en navigateur reel.",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  403,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.tripadvisor.fr/Search?q=Milan\u0026checkin=2026-09-30\u0026checkout=2026-10-02",
+                                                      "name":  "Tripadvisor (Milan 3p)",
+                                                      "response_time_ms":  345,
+                                                      "status_text":  "PASS (HTTP 403 - Protege WAF/Anti-Bot)",
+                                                      "notes":  "Serveur en ligne. Repond avec challenge WAF pour bot headless. Totalement accessible en navigateur reel.",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  200,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.hostelworld.com/st/hostels/milan/?dateFrom=2026-09-30\u0026dateTo=2026-10-02\u0026number_of_guests=3",
+                                                      "name":  "Hostelworld (Milan 3p)",
+                                                      "response_time_ms":  2512,
+                                                      "status_text":  "PASS (HTTP 200)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  200,
+                                                      "category":  "ota_search_engines",
+                                                      "url":  "https://www.kayak.fr/hotels/Milan/2026-09-30/2026-10-02/3adults",
+                                                      "name":  "Kayak (Milan 3p)",
+                                                      "response_time_ms":  1283,
+                                                      "status_text":  "PASS (HTTP 200)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  }
+                                              ],
+                       "hotel_direct_slugs":  [
+                                                  {
+                                                      "http_status":  202,
+                                                      "category":  "hotel_direct_slugs",
+                                                      "url":  "https://www.booking.com/hotel/es/exe-convention-plaza-madrid.fr.html",
+                                                      "name":  "Booking Slug : Exe Convention Plaza Madrid",
+                                                      "response_time_ms":  127,
+                                                      "status_text":  "PASS (HTTP 202)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  202,
+                                                      "category":  "hotel_direct_slugs",
+                                                      "url":  "https://www.booking.com/hotel/es/porcel-alixia.fr.html",
+                                                      "name":  "Booking Slug : Porcel Alixia Madrid",
+                                                      "response_time_ms":  135,
+                                                      "status_text":  "PASS (HTTP 202)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  202,
+                                                      "category":  "hotel_direct_slugs",
+                                                      "url":  "https://www.booking.com/hotel/es/persal.fr.html",
+                                                      "name":  "Booking Slug : Persal Madrid",
+                                                      "response_time_ms":  115,
+                                                      "status_text":  "PASS (HTTP 202)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  },
+                                                  {
+                                                      "http_status":  200,
+                                                      "category":  "hotel_direct_slugs",
+                                                      "url":  "https://www.google.com/travel/hotels?q=Duomo%20Milano\u0026dates=2026-09-30%2C2026-10-02\u0026adults=3\u0026hl=fr",
+                                                      "name":  "Google Hotels : Hotel Duomo Milano",
+                                                      "response_time_ms":  596,
+                                                      "status_text":  "PASS (HTTP 200)",
+                                                      "notes":  "",
+                                                      "is_operational":  true
+                                                  }
+                                              ],
+                       "cdn_and_assets":  [
+                                              {
+                                                  "http_status":  200,
+                                                  "category":  "cdn_and_assets",
+                                                  "url":  "https://cdn.tailwindcss.com",
+                                                  "name":  "Tailwind CSS CDN",
+                                                  "response_time_ms":  448,
+                                                  "status_text":  "PASS (HTTP 200)",
+                                                  "notes":  "",
+                                                  "is_operational":  true
+                                              },
+                                              {
+                                                  "http_status":  200,
+                                                  "category":  "cdn_and_assets",
+                                                  "url":  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+                                                  "name":  "Leaflet CSS (v1.9.4)",
+                                                  "response_time_ms":  264,
+                                                  "status_text":  "PASS (HTTP 200)",
+                                                  "notes":  "",
+                                                  "is_operational":  true
+                                              },
+                                              {
+                                                  "http_status":  200,
+                                                  "category":  "cdn_and_assets",
+                                                  "url":  "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+                                                  "name":  "Leaflet JS (v1.9.4)",
+                                                  "response_time_ms":  78,
+                                                  "status_text":  "PASS (HTTP 200)",
+                                                  "notes":  "",
+                                                  "is_operational":  true
+                                              },
+                                              {
+                                                  "http_status":  200,
+                                                  "category":  "cdn_and_assets",
+                                                  "url":  "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900\u0026display=swap",
+                                                  "name":  "Google Fonts (Plus Jakarta Sans)",
+                                                  "response_time_ms":  325,
+                                                  "status_text":  "PASS (HTTP 200)",
+                                                  "notes":  "",
+                                                  "is_operational":  true
+                                              },
+                                              {
+                                                  "http_status":  200,
+                                                  "category":  "cdn_and_assets",
+                                                  "url":  "https://a.basemaps.cartocdn.com/rastertiles/voyager/10/512/356.png",
+                                                  "name":  "CartoDB Voyager Map Tiles",
+                                                  "response_time_ms":  241,
+                                                  "status_text":  "PASS (HTTP 200)",
+                                                  "notes":  "",
+                                                  "is_operational":  true
+                                              }
+                                          ],
+                       "apis_and_services":  [
+                                                 {
+                                                     "http_status":  200,
+                                                     "category":  "apis_and_services",
+                                                     "url":  "https://geocoding-api.open-meteo.com/v1/search?name=Milan\u0026count=1\u0026language=fr\u0026format=json",
+                                                     "name":  "Open-Meteo Geocoding (Milan)",
+                                                     "response_time_ms":  444,
+                                                     "status_text":  "PASS (HTTP 200)",
+                                                     "notes":  "",
+                                                     "is_operational":  true
+                                                 },
+                                                 {
+                                                     "http_status":  200,
+                                                     "category":  "apis_and_services",
+                                                     "url":  "https://api.open-meteo.com/v1/forecast?latitude=45.4642\u0026longitude=9.1916\u0026daily=weathercode,temperature_2m_max,temperature_2m_min\u0026timezone=auto",
+                                                     "name":  "Open-Meteo Weather Forecast (Milan)",
+                                                     "response_time_ms":  369,
+                                                     "status_text":  "PASS (HTTP 200)",
+                                                     "notes":  "",
+                                                     "is_operational":  true
+                                                 },
+                                                 {
+                                                     "http_status":  200,
+                                                     "category":  "apis_and_services",
+                                                     "url":  "https://photon.komoot.io/api/?q=Milan\u0026limit=1",
+                                                     "name":  "Photon Komoot Geocoding (Milan)",
+                                                     "response_time_ms":  1053,
+                                                     "status_text":  "PASS (HTTP 200)",
+                                                     "notes":  "",
+                                                     "is_operational":  true
+                                                 },
+                                                 {
+                                                     "http_status":  200,
+                                                     "category":  "apis_and_services",
+                                                     "url":  "https://nominatim.openstreetmap.org/search?format=json\u0026q=Milan\u0026limit=1",
+                                                     "name":  "OpenStreetMap Nominatim Search (Milan)",
+                                                     "response_time_ms":  457,
+                                                     "status_text":  "PASS (HTTP 200)",
+                                                     "notes":  "",
+                                                     "is_operational":  true
+                                                 }
+                                             ]
+                   },
+    "passed":  19,
+    "blocked_or_anti_bot":  4,
+    "failed":  0
+}

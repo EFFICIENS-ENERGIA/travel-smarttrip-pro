@@ -1,0 +1,61 @@
+{
+  "description": "Matrice de fuzzing de sécurité et de robustesse aux entrées hostiles",
+  "listings": [
+    {
+      "id": "fuzz_xss_script",
+      "title": "<script>alert('XSS_ATTACK')</script>",
+      "location": "Milan <img src=x onerror=alert(1)>",
+      "price_per_night_eur": 110.0,
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano"
+    },
+    {
+      "id": "fuzz_negative_price",
+      "title": "Hotel Prix Negatif Fraude",
+      "location": "Milan",
+      "price_per_night_eur": -45.0,
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano"
+    },
+    {
+      "id": "fuzz_nan_price",
+      "title": "Hotel Prix NaN",
+      "location": "Milan",
+      "price_per_night_eur": "NaN",
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano"
+    },
+    {
+      "id": "fuzz_string_formatted_price",
+      "title": "Hotel Prix Chaine Formatee",
+      "location": "Milan",
+      "price_per_night_eur": "125,50 € TTC",
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano"
+    },
+    {
+      "id": "fuzz_malformed_url_scheme",
+      "title": "Hotel URL Javascript Dangereuse",
+      "location": "Milan",
+      "price_per_night_eur": 90.0,
+      "currency": "EUR",
+      "url": "javascript:alert(document.cookie)"
+    },
+    {
+      "id": "fuzz_file_url_scheme",
+      "title": "Hotel URL File Local Hostile",
+      "location": "Milan",
+      "price_per_night_eur": 95.0,
+      "currency": "EUR",
+      "url": "file:///C:/Windows/System32/drivers/etc/hosts"
+    },
+    {
+      "id": "fuzz_empty_payload",
+      "title": "   ",
+      "location": "",
+      "price_per_night_eur": null,
+      "currency": null,
+      "url": ""
+    }
+  ]
+}

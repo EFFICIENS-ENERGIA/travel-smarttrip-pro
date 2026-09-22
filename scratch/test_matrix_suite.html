@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Banc d'Essai Matrice 10 Destinations × (2, 3, 4, 5, 6 Voyageurs) - SmartTrip Pro</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; margin: 0; }
+    h1 { color: #38bdf8; font-size: 24px; margin-bottom: 4px; }
+    .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+    .summary-card { background: #1e293b; border-radius: 16px; padding: 18px 24px; border: 2px solid #334155; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+    .summary-text { font-size: 18px; font-weight: 800; color: #10b981; }
+    .dest-group { background: #1e293b; border-radius: 14px; border: 1px solid #334155; margin-bottom: 14px; overflow: hidden; }
+    .dest-header { background: #334155; padding: 10px 16px; font-weight: 800; font-size: 15px; color: #f1f5f9; display: flex; justify-content: space-between; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; padding: 12px; }
+    .scenario-card { background: #0f172a; border-radius: 10px; padding: 10px; border: 1px solid #1e293b; font-size: 12px; }
+    .scenario-card.pass { border-color: #059669; }
+    .scenario-card.fail { border-color: #dc2626; background: #450a0a; }
+    .badge-pass { background: #065f46; color: #6ee7b7; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+    .badge-fail { background: #991b1b; color: #fca5a5; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+    iframe { position: absolute; width: 1px; height: 1px; left: -9999px; }
+  </style>
+</head>
+<body>
+
+  <iframe id="appFrame" src="../travel_dashboard.html"></iframe>
+
+  <h1>🧪 BANC D'ESSAI INDUSTRIEL : 10 DESTINATIONS × (2, 3, 4, 5, 6 VOYAGEURS)</h1>
+  <div class="subtitle">Validation rigoureuse des prix, fiches du logement, URLs OTA, devises et étanchéité budgétaire &amp; kilométrique</div>
+
+  <div id="summaryCard" class="summary-card">
+    <div id="summaryText" class="summary-text">Initialisation du banc d'essai...</div>
+    <div id="summaryStats" style="font-weight:700; font-size:14px; color:#cbd5e1;"></div>
+  </div>
+
+  <div id="resultsContainer"></div>
+
+  <script>
+    const DESTINATIONS = [
+      { name: "Paris", country: "France", landmark: "Tour Eiffel", budgetMin: 60, budgetMax: 250, dist: 3.5 },
+      { name: "Japon", country: "Japon (Tokyo)", landmark: "Shinjuku", budgetMin: 50, budgetMax: 220, dist: 4.0 },
+      { name: "Tokyo", country: "Japon", landmark: "Shibuya Crossing", budgetMin: 60, budgetMax: 200, dist: 3.0 },
+      { name: "New York", country: "USA", landmark: "Times Square", budgetMin: 80, budgetMax: 350, dist: 3.0 },
+      { name: "Rome", country: "Italie", landmark: "Fontaine de Trevi", budgetMin: 40, budgetMax: 160, dist: 2.5 },
+      { name: "Londres", country: "UK", landmark: "Big Ben", budgetMin: 70, budgetMax: 240, dist: 3.0 },
+      { name: "Madrid", country: "Espagne", landmark: "Puerta del Sol", budgetMin: 45, budgetMax: 150, dist: 2.0 },
+      { name: "Nice", country: "France", landmark: "Promenade des Anglais", budgetMin: 55, budgetMax: 190, dist: 2.5 },
+      { name: "Amsterdam", country: "Pays-Bas", landmark: "Place du Dam", budgetMin: 65, budgetMax: 220, dist: 3.0 },
+      { name: "Séville", country: "Espagne", landmark: "Giralda", budgetMin: 40, budgetMax: 140, dist: 2.0 }
+    ];
+
+    const GUEST_COUNTS = [2, 3, 4, 5, 6];
+    const PLATFORMS = ['googletravel', 'booking', 'airbnb', 'hotelscom', 'agoda', 'expedia', 'abritel', 'tripadvisor', 'hostelworld', 'kayak'];
+
+    const frame = document.getElementById('appFrame');
+    frame.onload = () => {
+      setTimeout(runAllMatrixTests, 1200);
+    };
+
+    function runAllMatrixTests() {
+      const win = frame.contentWindow;
+      const doc = frame.contentDocument;
+      const resultsContainer = document.getElementById('resultsContainer');
+      resultsContainer.innerHTML = '';
+
+      let totalScenarios = 0;
+      let passedScenarios = 0;
+      let failedScenarios = 0;
+      const errorsList = [];
+
+      DESTINATIONS.forEach(destObj => {
+        const destGroup = document.createElement('div');
+        destGroup.className = 'dest-group';
+
+        const header = document.createElement('div');
+        header.className = 'dest-header';
+        header.innerHTML = `<span>📍 ${destObj.name} (${destObj.country}) • Repère : ${destObj.landmark} • Budget : ${destObj.budgetMin}-${destObj.budgetMax}€ • Rayon : ${destObj.dist}km</span>`;
+        destGroup.appendChild(header);
+
+        const grid = document.createElement('div');
+        grid.className = 'scenario-grid';
+
+        GUEST_COUNTS.forEach(guests => {
+          totalScenarios++;
+          let scenarioPass = true;
+          const failureReasons = [];
+
+          try {
+            // 1. Appel du moteur pour cette destination et ce nombre de voyageurs
+            const ci = '2026-10-15';
+            const co = '2026-10-18';
+            let allOffers = [];
+
+            PLATFORMS.forEach(p => {
+              const list = win.getPlatformTop4Listings(p, destObj.name, ci, co, guests, destObj.budgetMin, destObj.budgetMax, destObj.landmark, destObj.dist);
+              if (!Array.isArray(list) || list.length !== 4) {
+                scenarioPass = false;
+                failureReasons.push(`${p}: attendu 4 offres, reçu ${list ? list.length : 0}`);
+              } else {
+                allOffers = allOffers.concat(list);
+              }
+            });
+
+            // 2. Vérification de l'étanchéité absolue (40 offres)
+            if (allOffers.length !== 40) {
+              scenarioPass = false;
+              failureReasons.push(`Total offres: ${allOffers.length}/40`);
+            }
+
+            allOffers.forEach(o => {
+              // Vérification budget
+              if (o.price < destObj.budgetMin) {
+                scenarioPass = false;
+                failureReasons.push(`Prix sous min: ${o.name} (${o.price}€ < ${destObj.budgetMin}€)`);
+              }
+              if (o.price > destObj.budgetMax) {
+                scenarioPass = false;
+                failureReasons.push(`Prix sur max: ${o.name} (${o.price}€ > ${destObj.budgetMax}€)`);
+              }
+              // Vérification distance
+              if (o.realDistKm > destObj.dist) {
+                scenarioPass = false;
+                failureReasons.push(`Hors rayon: ${o.name} (${o.realDistKm}km > ${destObj.dist}km)`);
+              }
+              // Vérification absence mention négative
+              if (o.distText && o.distText.includes('Hors rayon') && !o.distText.includes('Dans votre rayon')) {
+                scenarioPass = false;
+                failureReasons.push(`Mention 'Hors rayon' détectée`);
+              }
+              if (o.budgetStatusText && o.budgetStatusText.includes('Dépasse de')) {
+                scenarioPass = false;
+                failureReasons.push(`Mention 'Dépasse de' détectée`);
+              }
+              // Vérification query Google Hotels saine (aucun poison 'pour X personnes')
+              if (o.googleUrl && o.googleUrl.includes(encodeURIComponent('pour ' + guests + ' personnes'))) {
+                scenarioPass = false;
+                failureReasons.push(`Poison 'pour X personnes' dans Google URL`);
+              }
+              if (!o.googleUrl || !o.googleUrl.includes('google.com/travel/hotels')) {
+                scenarioPass = false;
+                failureReasons.push(`Google URL invalide`);
+              }
+              // Vérification directUrl
+              if (!o.directUrl || o.directUrl.length < 15) {
+                scenarioPass = false;
+                failureReasons.push(`Direct URL manquante pour ${o.platformShort}`);
+              }
+            });
+
+            // 3. Test de la Fiche du Logement (modal interactive)
+            if (typeof win.openHotelDetailModal === 'function') {
+              const testOffer = allOffers[0];
+              win.openHotelDetailModal(testOffer);
+              const modal = doc.getElementById('hotelDetailModal');
+              if (!modal || modal.classList.contains('hidden')) {
+                scenarioPass = false;
+                failureReasons.push(`Modale fiche logement fermée après appel`);
+              } else {
+                const titleEl = doc.getElementById('hdmTitle');
+                if (!titleEl || titleEl.innerText !== testOffer.name) {
+                  scenarioPass = false;
+                  failureReasons.push(`Titre modale non synchronisé`);
+                }
+                win.closeHotelDetailModal();
+                if (!modal.classList.contains('hidden')) {
+                  scenarioPass = false;
+                  failureReasons.push(`Modale fiche logement non refermée`);
+                }
+              }
+            } else {
+              scenarioPass = false;
+              failureReasons.push(`openHotelDetailModal non exposé`);
+            }
+
+            // 4. Test Mode Grand Groupe pour 5 et 6 voyageurs
+            if (guests >= 5) {
+              const gInput = doc.getElementById('guestsInput');
+              if (gInput) {
+                gInput.value = guests;
+                if (win.renderPlatformCards) {
+                  win.renderPlatformCards();
+                  const gridHtml = doc.getElementById('platformsGrid')?.innerHTML || '';
+                  if (!gridHtml.toUpperCase().includes('MODE GRAND GROUPE')) {
+                    scenarioPass = false;
+                    failureReasons.push(`Bannière Mode Grand Groupe manquante pour ${guests}p`);
+                  }
+                }
+              }
+            }
+
+          } catch(err) {
+            scenarioPass = false;
+            failureReasons.push(`Exception: ${err.message}`);
+          }
+
+          if (scenarioPass) {
+            passedScenarios++;
+          } else {
+            failedScenarios++;
+            errorsList.push(`[${destObj.name} - ${guests}p] : ${failureReasons.join(', ')}`);
+          }
+
+          const card = document.createElement('div');
+          card.className = `scenario-card ${scenarioPass ? 'pass' : 'fail'}`;
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <strong>👥 ${guests} Voyageurs</strong>
+              <span class="${scenarioPass ? 'badge-pass' : 'badge-fail'}">${scenarioPass ? 'PASS' : 'FAIL'}</span>
+            </div>
+            <div style="color:${scenarioPass ? '#94a3b8' : '#f87171'}; font-size:11px;">
+              ${scenarioPass ? '✓ 40/40 offres conformes • Fiche OK • OTA OK' : failureReasons.join('<br>')}
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        destGroup.appendChild(grid);
+        resultsContainer.appendChild(destGroup);
+      });
+
+      const sumText = document.getElementById('summaryText');
+      const sumStats = document.getElementById('summaryStats');
+
+      if (failedScenarios === 0) {
+        sumText.innerHTML = `🏆 BANC D'ESSAI RÉUSSI À 100% : ${passedScenarios}/${totalScenarios} SCÉNARIOS CERTIFIÉS SANS DÉFAUT`;
+        sumText.style.color = '#10b981';
+      } else {
+        sumText.innerHTML = `⚠️ DÉFAILLANCES DÉTECTÉES : ${failedScenarios}/${totalScenarios} ÉCHECS`;
+        sumText.style.color = '#ef4444';
+      }
+
+      sumStats.innerHTML = `10 DESTINATIONS • 5 OCCUPATIONS (2,3,4,5,6p) • TOTAL : ${totalScenarios} SCÉNARIOS (${totalScenarios * 40} OFFRES TESTÉES)`;
+
+      window.__MATRIX_AUDIT_FINISHED__ = true;
+      window.__MATRIX_AUDIT_PASSED__ = (failedScenarios === 0);
+      window.__MATRIX_AUDIT_TOTAL__ = totalScenarios;
+      window.__MATRIX_AUDIT_SUCCESS__ = passedScenarios;
+      window.__MATRIX_AUDIT_FAILURES__ = failedScenarios;
+      window.__MATRIX_AUDIT_ERRORS__ = errorsList;
+    }
+  </script>
+</body>
+</html>

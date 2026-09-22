@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Banc d'Essai Hôtelier v2 - Fiabilité, Cibles Réelles & Détection - SmartTrip Pro</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b0f19; color: #f8fafc; padding: 24px; margin: 0; }
+    h1 { color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+    .subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+    .card { background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .test-box { background: #0f172a; border-radius: 10px; padding: 14px; border: 1px solid #334155; }
+    .test-box.pass { border-color: #10b981; }
+    .test-box.fail { border-color: #ef4444; background: #450a0a; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+    .badge-pass { background: #065f46; color: #6ee7b7; }
+    .badge-fail { background: #991b1b; color: #fca5a5; }
+    .stat-val { font-size: 24px; font-weight: 900; color: #10b981; }
+    pre { font-size: 11px; color: #94a3b8; overflow-x: auto; margin-top: 6px; background: #020617; padding: 8px; border-radius: 6px; }
+    iframe { width: 1px; height: 1px; position: absolute; left: -9999px; }
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="../travel_dashboard.html"></iframe>
+
+  <h1>🛡️ CERTIFICATION QA & GROUND TRUTH v2 : CIBLAGE D'ÉTABLISSEMENTS & ZÉRO RÉSULTAT ÉRADIQUÉ</h1>
+  <div class="subtitle">Banc d'essai automatisé sous Microsoft Edge Headless : détection hôtel par nom, gestion budget honnête, boutons d'alignement 1-clic, parité binaire stricte.</div>
+
+  <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <div style="font-size:12px; color:#94a3b8; font-weight:bold; text-transform:uppercase;">Statut Global Banc d'Essai</div>
+      <div id="globalStatus" class="stat-val">EN COURS D'EXÉCUTION...</div>
+    </div>
+    <div style="text-align:right;">
+      <div id="testCounts" style="font-size:14px; font-weight:bold; color:#cbd5e1;">0 / 0 tests validés</div>
+      <div id="timestamp" style="font-size:11px; color:#64748b;"></div>
+    </div>
+  </div>
+
+  <div id="testsContainer" class="grid"></div>
+
+  <script>
+    const frame = document.getElementById('appFrame');
+    const results = [];
+
+    frame.onload = () => {
+      setTimeout(runSuite, 1200);
+    };
+
+    function assert(id, title, condition, details) {
+      results.push({ id, title, pass: !!condition, details });
+      renderResults();
+    }
+
+    function renderResults() {
+      const container = document.getElementById('testsContainer');
+      const passCount = results.filter(r => r.pass).length;
+      const totalCount = results.length;
+      const isAllPass = passCount === totalCount && totalCount > 0;
+
+      document.getElementById('testCounts').innerText = `${passCount} / ${totalCount} tests validés`;
+      document.getElementById('timestamp').innerText = new Date().toLocaleTimeString('fr-FR');
+
+      const globalEl = document.getElementById('globalStatus');
+      if (isAllPass) {
+        globalEl.innerText = `✅ 100% PASS (${passCount}/${totalCount})`;
+        globalEl.style.color = '#10b981';
+      } else {
+        globalEl.innerText = `❌ ${totalCount - passCount} ÉCHEC(S)`;
+        globalEl.style.color = '#ef4444';
+      }
+
+      container.innerHTML = results.map(r => `
+        <div class="test-box ${r.pass ? 'pass' : 'fail'}">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-weight:bold; font-size:13px; color:#f8fafc;">${r.id}</span>
+            <span class="badge ${r.pass ? 'badge-pass' : 'badge-fail'}">${r.pass ? 'PASS' : 'FAIL'}</span>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; margin-bottom:4px;">${r.title}</div>
+          <pre>${r.details}</pre>
+        </div>
+      `).join('');
+    }
+
+    async function runSuite() {
+      const win = frame.contentWindow;
+      const doc = win.document;
+
+      // TEST 1 : FormatCurrencyPrice mode texte sans balise HTML
+      const priceText = win.formatCurrencyPrice(105, false);
+      const isNoHtml = !priceText.includes('<') && priceText.includes('105 €');
+      assert('T1_PRICE_TEXT_NO_HTML', 'formatCurrencyPrice texte brut sans HTML', isNoHtml, `Valeur : "${priceText}"`);
+
+      // TEST 2 : Détection par nom d'hôtel spécifique "Hotel Alfonso XIII"
+      const alfonsoList = win.getVerifiedHotelsForDest('Hotel Alfonso XIII');
+      const alfonsoFound = alfonsoList && alfonsoList.length > 0 && alfonsoList[0].name === 'Hotel Alfonso XIII' && alfonsoList[0].isTargetHotel === true;
+      assert('T2_ALFONSO_DETECTION', 'Détection immédiate d\'Hotel Alfonso XIII comme établissement cible', alfonsoFound, `Trouvé : ${alfonsoList ? alfonsoList.length + ' hôtels, 1er: ' + alfonsoList[0].name : 'NULL'}`);
+
+      // TEST 3 : Détection par nom partiel "Mercure Meylan"
+      const meylanList = win.getVerifiedHotelsForDest('Mercure Meylan');
+      const meylanFound = meylanList && meylanList.length > 0 && meylanList[0].name.includes('Meylan');
+      assert('T3_MERCURE_MEYLAN_DETECTION', 'Détection immédiate de Mercure Meylan à Grenoble', meylanFound, `Trouvé : ${meylanList ? meylanList[0].name : 'NULL'}`);
+
+      // TEST 4 : Recherche "Hotel Alfonso XIII" avec budget max 105 €
+      doc.getElementById('destInput').value = 'Hotel Alfonso XIII';
+      doc.getElementById('minPriceInput').value = '0';
+      doc.getElementById('maxPriceInput').value = '105';
+      doc.getElementById('guestsInput').value = '2';
+      win.updatePriceBadge();
+      await win.searchLiveAccommodations('Hotel Alfonso XIII');
+
+      const gridHtml = doc.getElementById('liveAccommodationsGrid').innerHTML;
+      const hasBanner = gridHtml.includes('Établissement recherché') && gridHtml.includes('480 €') && gridHtml.includes('setBudgetMax(480)');
+      assert('T4_TARGETED_OVER_BUDGET_BANNER', 'Encart d\'alerte transparente avec vrai prix 480 € et bouton 1-clic', hasBanner, `Présence encart Alfonso XIII 480 € : ${hasBanner}`);
+
+      // TEST 5 : Présence des alternatives conformes ≤ 105 € sous l'encart
+      const compliantPriceElements = Array.from(doc.querySelectorAll('#liveAccommodationsGrid [data-card-price]')).map(el => parseInt(el.getAttribute('data-card-price'), 10));
+      const compliantAllUnder105 = compliantPriceElements.length > 0 && compliantPriceElements.every(p => p <= 105);
+      assert('T5_COMPLIANT_ALTERNATIVES_UNDER_105', 'Alternatives de Séville strictement conformes au budget ≤ 105 €', compliantAllUnder105, `Prix conformes trouvés : ${compliantPriceElements.join(' €, ')} €`);
+
+      // TEST 6 : Alfonso XIII n'est PAS inséré frauduleusement dans les cartes conformes
+      const alfonsoInCards = compliantPriceElements.some(p => p >= 400);
+      assert('T6_NO_FRAUDULENT_ALFONSO_IN_CARDS', 'Hotel Alfonso XIII exclu de la liste active ≤ 105 € (Règle 02 & 13)', !alfonsoInCards, `Présence d'offre >= 400 € dans cartes actives : ${alfonsoInCards}`);
+
+      // TEST 7 : Action 1-clic setBudgetMax(480)
+      win.setBudgetMax(480);
+      await new Promise(r => setTimeout(r, 400));
+      const newMaxVal = parseInt(doc.getElementById('maxPriceInput').value, 10);
+      const newGridHtml = doc.getElementById('liveAccommodationsGrid').innerHTML;
+      const alfonsoNowInCards = newGridHtml.includes('Hotel Alfonso XIII') && doc.querySelectorAll('#liveAccommodationsGrid [data-card-price]').length >= 5;
+      assert('T7_ALIGN_BUDGET_ONE_CLICK', 'Bouton 1-clic aligne le budget à 480 € et intègre l\'hôtel', newMaxVal === 480 && alfonsoNowInCards, `Nouveau budget max : ${newMaxVal} €, Alfonso XIII présent : ${alfonsoNowInCards}`);
+
+      // TEST 8 : Paste accidentel de lien de fichier local file:///...
+      doc.getElementById('destInput').value = 'file:///C:/Users/EFFICIENS ENERGIA/Desktop/ANTIGRAVITY/$HOMEagy2-projectsmy-first-project/dist_smarttrip_pro/index.html';
+      win.searchLiveAccommodations(doc.getElementById('destInput').value);
+      await new Promise(r => setTimeout(r, 300));
+      const restoredDest = doc.getElementById('destInput').value;
+      const safeFallback = restoredDest === 'Séville' && doc.querySelectorAll('#liveAccommodationsGrid [data-card-price]').length > 0;
+      assert('T8_SAFE_FILE_URL_FALLBACK', 'Assainissement automatique des liens file:/// locaux collés par erreur', safeFallback, `Destination rétablie : "${restoredDest}"`);
+
+      // TEST 9 : Rendu instantané 0 ms pour villes majeures (ex: Lyon, Bordeaux, Rome)
+      const lyonHotels = win.getVerifiedHotelsForDest('Lyon');
+      const bordeauxHotels = win.getVerifiedHotelsForDest('Bordeaux');
+      const newCitiesSupported = lyonHotels && lyonHotels.length >= 4 && bordeauxHotels && bordeauxHotels.length >= 4;
+      assert('T9_NEW_CITIES_SUPPORTED', 'Support étendu de nouvelles métropoles réelles (Lyon, Bordeaux, Nice...)', newCitiesSupported, `Hôtels Lyon : ${lyonHotels?.length}, Bordeaux : ${bordeauxHotels?.length}`);
+
+      // TEST 10 : Zéro résultat vide : le cockpit méta-recherche (10 comparateurs) reste 100% opérationnel
+      const platCards = doc.querySelectorAll('#platformsGrid [data-platform-card]').length;
+      assert('T10_PLATFORMS_GRID_INTACT', 'Cockpit des 10 comparateurs officiels 100% opérationnel', platCards === 10, `Nombre de plateformes actives : ${platCards}`);
+
+      renderResults();
+    }
+  </script>
+</body>
+</html>

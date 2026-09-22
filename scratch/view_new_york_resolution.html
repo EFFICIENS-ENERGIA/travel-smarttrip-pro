@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Résolution Définitive - New York & Hotel New York</title>
+  <style>
+    body { margin: 0; padding: 12px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; }
+    iframe { width: 100%; height: 2600px; border: none; border-radius: 12px; }
+  </style>
+</head>
+<body>
+  <iframe id="mainFrame" src="../dist_smarttrip_pro/index.html"></iframe>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') || 'nyc';
+
+    async function initTest() {
+      const frame = document.getElementById('mainFrame');
+      let win = frame.contentWindow;
+      let doc = win ? win.document : null;
+
+      // Attendre que l'iframe soit complètement initialisée
+      for (let i = 0; i < 50; i++) {
+        if (win && doc && doc.getElementById('destInput') && typeof win.executeSearch === 'function') {
+          break;
+        }
+        await new Promise(r => setTimeout(r, 100));
+        win = frame.contentWindow;
+        doc = win ? win.document : null;
+      }
+
+      if (mode === 'nyc') {
+        doc.getElementById('destInput').value = 'New York';
+        doc.getElementById('landmarkInput').value = 'Central Park';
+        doc.getElementById('minPriceInput').value = '40';
+        doc.getElementById('minPriceRange').value = '40';
+        doc.getElementById('maxPriceInput').value = '180';
+        doc.getElementById('maxPriceRange').value = '180';
+        doc.getElementById('distInput').value = '6.5';
+        doc.getElementById('distRange').value = '6.5';
+        doc.getElementById('guestsInput').value = '2';
+        win.updatePriceBadge();
+        win.updateDistanceBadge();
+        win.executeSearch();
+      } else {
+        doc.getElementById('destInput').value = 'Hotel New York';
+        doc.getElementById('minPriceInput').value = '0';
+        doc.getElementById('minPriceRange').value = '0';
+        doc.getElementById('maxPriceInput').value = '300';
+        doc.getElementById('maxPriceRange').value = '300';
+        doc.getElementById('distInput').value = '15.0';
+        doc.getElementById('distRange').value = '15.0';
+        doc.getElementById('guestsInput').value = '2';
+        win.updatePriceBadge();
+        win.updateDistanceBadge();
+        win.executeSearch();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(initTest, 600);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; background:#0f172a;">
+  <iframe id="app" src="../dist_smarttrip_pro/index.html" style="width:1280px; height:2600px; border:none;"></iframe>
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      const frame = document.getElementById('app');
+      let win = frame.contentWindow;
+      let doc = win ? win.document : null;
+      for (let i = 0; i < 50; i++) {
+        if (win && doc && doc.getElementById('destInput') && typeof win.executeSearch === 'function') break;
+        await new Promise(r => setTimeout(r, 100));
+        win = frame.contentWindow;
+        doc = win ? win.document : null;
+      }
+      doc.getElementById('destInput').value = 'Dallas';
+      doc.getElementById('minPriceInput').value = '40';
+      doc.getElementById('minPriceRange').value = '40';
+      doc.getElementById('maxPriceInput').value = '180';
+      doc.getElementById('maxPriceRange').value = '180';
+      doc.getElementById('distInput').value = '5.0';
+      doc.getElementById('distRange').value = '5.0';
+      doc.getElementById('guestsInput').value = '2';
+      win.updatePriceBadge();
+      win.updateDistanceBadge();
+      win.executeSearch();
+    });
+  </script>
+</body>
+</html>

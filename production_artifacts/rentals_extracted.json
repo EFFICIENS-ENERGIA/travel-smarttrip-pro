@@ -1,0 +1,43 @@
+{
+  "user_max_budget_eur": 150.0,
+  "extracted_at": "2026-09-13T20:59:34Z",
+  "listings": [
+    {
+      "location": "Milan, Italie",
+      "price_per_night_eur": 120.0,
+      "id": "item_01_valid_under_budget",
+      "is_url_verified": true,
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr",
+      "is_over_budget_suggestion": false,
+      "http_status": 200,
+      "title": "Hotel Duomo Milano",
+      "currency": "EUR"
+    },
+    {
+      "location": null,
+      "price_per_night_eur": 135.0,
+      "id": "item_02_valid_zero_hallucination_nulls",
+      "is_url_verified": true,
+      "url": "https://www.google.com/travel/hotels?q=Milano%20Centrale&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr",
+      "is_over_budget_suggestion": false,
+      "http_status": 200,
+      "title": null,
+      "currency": "EUR"
+    }
+  ],
+  "search_status": "SUCCESS",
+  "over_budget_suggestions": [
+    {
+      "location": "Milan, Italie",
+      "price_per_night_eur": 154.0,
+      "id": "item_03_over_budget_within_5pct",
+      "is_url_verified": true,
+      "url": "https://www.kayak.fr/hotels/Milan/2026-09-30/2026-10-02/3adults",
+      "is_over_budget_suggestion": true,
+      "http_status": 200,
+      "title": "Grand Hotel Milan Prestige",
+      "currency": "EUR"
+    }
+  ],
+  "total_valid_listings": 2
+}

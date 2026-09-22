@@ -1,0 +1,13 @@
+1. Surveillance Automatique des Baisses de Prix (via /schedule)
+Comment l'activer ?
+Tapez simplement dans le chat :
+"/schedule Vérifie tous les lundis à 9h les prix pour mon voyage à Madrid"
+Comment ça fonctionne en coulisses ?
+L'agent s'enregistre dans le planificateur natif d'Antigravity. Il se réveille automatiquement en arrière-plan sans ouvrir de fenêtre, ré-exécute la recherche multi-plateformes, et vous envoie une notification directe dans la conversation dès qu'un prix baisse ou qu'une chambre se libère.
+2. Générateur de Rappels Calendrier (.ics)
+Script dédié : 
+GenerateCalendarReminder.ps1
+Fonctionnalité :
+En un clic, l'agent génère un fichier .ics standard (compatible Google Agenda, Apple Calendar, Outlook) contenant :
+🛏️ Le séjour du Check-in au Check-out avec adresse et tarif.
+⏰ Une double alerte d'urgence (24h et 2h avant) pour ne jamais rater l'heure limite de l'annulation gratuite !

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Eval Seville</title></head>
+<body>
+  <iframe id="appFrame" src="../travel_dashboard.html" style="width:1200px; height:800px;"></iframe>
+  <div id="output">...</div>
+  <script>
+    const iframe = document.getElementById('appFrame');
+    iframe.onload = () => {
+      setTimeout(() => {
+        const dest = 'SÃ©ville';
+        const dLower = dest.toLowerCase().trim();
+        const dNorm = (dLower || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        
+        let cityKey = 'general';
+        if (dNorm.includes('sevil')) cityKey = 'seville';
+
+        const win = iframe.contentWindow;
+        // Let's test calling getPlatformTop4Listings with different inputs
+        const charCodes = Array.from(dest).map(c => c.charCodeAt(0));
+        const normCodes = Array.from(dNorm).map(c => c.charCodeAt(0));
+
+        const out = {
+          dest: dest,
+          charCodes: charCodes,
+          dNorm: dNorm,
+          normCodes: normCodes,
+          includesSevil: dNorm.includes('sevil'),
+          cityKey: cityKey
+        };
+        document.getElementById('output').innerText = JSON.stringify(out, null, 2);
+      }, 800);
+    };
+  </script>
+</body>
+</html>

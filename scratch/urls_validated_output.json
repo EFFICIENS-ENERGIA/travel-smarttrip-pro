@@ -1,0 +1,46 @@
+{
+  "listings": [
+    {
+      "is_url_verified": true,
+      "location": "Milan, Italie",
+      "http_status": 200,
+      "id": "item_01_valid_under_budget",
+      "currency": "EUR",
+      "title": "Hotel Duomo Milano",
+      "price_per_night_eur": 120.0,
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr"
+    },
+    {
+      "is_url_verified": true,
+      "location": null,
+      "http_status": 200,
+      "id": "item_02_valid_zero_hallucination_nulls",
+      "currency": "EUR",
+      "title": null,
+      "price_per_night_eur": 135.0,
+      "url": "https://www.google.com/travel/hotels?q=Milano%20Centrale&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr"
+    },
+    {
+      "is_url_verified": true,
+      "location": "Milan, Italie",
+      "http_status": 200,
+      "id": "item_03_over_budget_within_5pct",
+      "currency": "EUR",
+      "title": "Grand Hotel Milan Prestige",
+      "price_per_night_eur": 154.0,
+      "url": "https://www.kayak.fr/hotels/Milan/2026-09-30/2026-10-02/3adults"
+    },
+    {
+      "is_url_verified": true,
+      "location": "Milan, Italie",
+      "http_status": 200,
+      "id": "item_04_over_budget_far_exceeded",
+      "currency": "EUR",
+      "title": "Villa Royale San Siro Luxury Suite",
+      "price_per_night_eur": 280.0,
+      "url": "https://www.google.com/travel/hotels?q=San%20Siro%20Milan&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr"
+    }
+  ],
+  "total_valid_listings": 4,
+  "description": "Matrice de test multi-cas pour le moteur d'extraction et de recherche de logements"
+}

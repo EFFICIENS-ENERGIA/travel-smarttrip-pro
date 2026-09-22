@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <style>
+    body, html { margin:0; padding:0; width:100%; height:100%; background:#0f172a; }
+    iframe { width:100%; height:100%; border:none; }
+  </style>
+</head>
+<body>
+  <iframe id='frame' src='../dist_smarttrip_pro/index.html'></iframe>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const scen = urlParams.get('scen') || 'rome';
+    const frame = document.getElementById('frame');
+    frame.onload = async () => {
+      const win = frame.contentWindow;
+      const doc = win.document;
+      await new Promise(r => setTimeout(r, 800));
+      
+      if (scen === 'rome') {
+        doc.getElementById('destInput').value = 'Rome';
+        doc.getElementById('minPriceInput').value = '0';
+        doc.getElementById('maxPriceInput').value = '60';
+        doc.getElementById('maxPriceRange').value = '60';
+        doc.getElementById('distInput').value = '4.0';
+        doc.getElementById('distRange').value = '4.0';
+        doc.getElementById('guestsInput').value = '3';
+        win.updatePriceBadge();
+        win.updateDistanceBadge();
+        win.renderPlatformCards();
+        await win.searchLiveAccommodations('Rome');
+      } else if (scen === 'barcelona') {
+        doc.getElementById('destInput').value = 'Barcelone';
+        doc.getElementById('minPriceInput').value = '0';
+        doc.getElementById('maxPriceInput').value = '80';
+        doc.getElementById('maxPriceRange').value = '80';
+        doc.getElementById('distInput').value = '3.0';
+        doc.getElementById('distRange').value = '3.0';
+        doc.getElementById('guestsInput').value = '2';
+        win.updatePriceBadge();
+        win.updateDistanceBadge();
+        win.renderPlatformCards();
+        await win.searchLiveAccommodations('Barcelone');
+      } else if (scen === 'miami') {
+        doc.getElementById('destInput').value = 'Miami';
+        doc.getElementById('minPriceInput').value = '0';
+        doc.getElementById('maxPriceInput').value = '110';
+        doc.getElementById('maxPriceRange').value = '110';
+        doc.getElementById('distInput').value = '3.0';
+        doc.getElementById('distRange').value = '3.0';
+        doc.getElementById('guestsInput').value = '5';
+        win.updatePriceBadge();
+        win.updateDistanceBadge();
+        win.renderPlatformCards();
+        await win.searchLiveAccommodations('Miami');
+      }
+      setTimeout(() => {
+        const sec = doc.getElementById('liveAccommodationsSection');
+        if (sec) sec.scrollIntoView({ behavior: 'instant', block: 'start' });
+        window.__READY__ = true;
+      }, 1000);
+    };
+  </script>
+</body>
+</html>

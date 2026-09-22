@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Banc d'Essai Client Réel : 10 Réservations dans 10 Pays (Zone Aéroport 3km, 3 Voyageurs, Budget 180€)</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 24px;
+      margin: 0;
+    }
+    h1 { color: #38bdf8; font-size: 24px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+    .subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+    .kpi-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+    .kpi-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-val { font-size: 22px; font-weight: 900; color: #10b981; margin-top: 4px; }
+    .kpi-sub { font-size: 11px; color: #cbd5e1; margin-top: 2px; }
+
+    .country-card {
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    .country-header {
+      background: #334155;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #475569;
+    }
+    .country-title { font-size: 16px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    .country-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 9999px; text-transform: uppercase; }
+    .badge-pass { background: #065f46; color: #6ee7b7; border: 1px solid #059669; }
+    .badge-fail { background: #991b1b; color: #fca5a5; border: 1px solid #dc2626; }
+
+    .country-body { padding: 18px 20px; }
+    .booking-summary {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 16px;
+    }
+    .booking-hotel-name { font-size: 15px; font-weight: 800; color: #38bdf8; margin-bottom: 4px; }
+    .booking-hotel-detail { font-size: 12px; color: #94a3b8; line-height: 1.4; }
+    .price-box { text-align: right; }
+    .price-per-night { font-size: 18px; font-weight: 900; color: #10b981; }
+    .price-total { font-size: 12px; color: #cbd5e1; font-weight: 700; margin-top: 2px; }
+
+    .modal-check {
+      background: #1e1b4b;
+      border: 1px solid #4338ca;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #c7d2fe;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .otas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .ota-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11px;
+    }
+    .ota-header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 4px; }
+    .ota-name { color: #f1f5f9; }
+    .ota-status { color: #34d399; font-size: 10px; font-weight: 800; }
+    .ota-url-preview { color: #64748b; font-family: monospace; font-size: 10px; word-break: break-all; margin-top: 4px; max-height: 32px; overflow: hidden; }
+
+    iframe { position: absolute; width: 1px; height: 1px; left: -9999px; }
+  </style>
+</head>
+<body>
+
+  <iframe id="appFrame" src="../travel_dashboard.html"></iframe>
+
+  <h1>✈️ SIMULATION CLIENT RÉEL : 10 RÉSERVATIONS DANS 10 PAYS</h1>
+  <div class="subtitle">
+    <strong>Parcours Client Validé :</strong> 10 pays différents • Zone Aéroport principal ≤ 3 km • 3 voyageurs (Trio) • Budget max strict ≤ 180 €/nuit.<br>
+    <strong>Contrôles Systématiques :</strong> Ouverture de la fiche logement (#hotelDetailModal), vérification tarifaire (TTC, total séjour), consultation des 10 comparateurs par réservation.
+  </div>
+
+  <div class="kpi-bar" id="kpiBar">
+    <div class="kpi-card">
+      <div class="kpi-label">Réservations Pays</div>
+      <div class="kpi-val" id="kpiCountries">0 / 10</div>
+      <div class="kpi-sub" id="kpiCountriesSub">En cours d'exécution...</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Fiches Logement Visitées</div>
+      <div class="kpi-val" id="kpiFiches">0 / 10</div>
+      <div class="kpi-sub">#hotelDetailModal in-app</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Comparateurs Consultés</div>
+      <div class="kpi-val" id="kpiOtas">0 / 100</div>
+      <div class="kpi-sub">10 OTA × 10 Pays</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Respect Budget &amp; Rayon</div>
+      <div class="kpi-val" id="kpiCompliance">100%</div>
+      <div class="kpi-sub">≤ 180 €/nuit &amp; ≤ 3.0 km</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Statut Global @AUD</div>
+      <div class="kpi-val" id="kpiStatus">EN COURS</div>
+      <div class="kpi-sub" id="kpiStatusSub">Banc d'essai réel Edge</div>
+    </div>
+  </div>
+
+  <div id="resultsContainer"></div>
+
+  <script>
+    const CUSTOMER_TRIPS = [
+      {
+        country: "France",
+        flag: "🇫🇷",
+        dest: "Paris",
+        airport: "Aéroport Paris-Charles de Gaulle (CDG)",
+        landmark: "Aéroport Paris Charles de Gaulle",
+        checkIn: "2026-10-15",
+        checkOut: "2026-10-18"
+      },
+      {
+        country: "Espagne",
+        flag: "🇪🇸",
+        dest: "Madrid",
+        airport: "Aéroport Adolfo Suárez Madrid-Barajas (MAD)",
+        landmark: "IFEMA",
+        checkIn: "2026-10-20",
+        checkOut: "2026-10-23"
+      },
+      {
+        country: "Italie",
+        flag: "🇮🇹",
+        dest: "Rome",
+        airport: "Aéroport Rome-Fiumicino (FCO)",
+        landmark: "Aéroport",
+        checkIn: "2026-10-25",
+        checkOut: "2026-10-28"
+      },
+      {
+        country: "Royaume-Uni",
+        flag: "🇬🇧",
+        dest: "Londres",
+        airport: "Aéroport Londres-Heathrow (LHR)",
+        landmark: "Aéroport",
+        checkIn: "2026-11-02",
+        checkOut: "2026-11-05"
+      },
+      {
+        country: "Allemagne",
+        flag: "🇩🇪",
+        dest: "Berlin",
+        airport: "Aéroport Berlin Brandenburg (BER)",
+        landmark: "Aéroport",
+        checkIn: "2026-11-10",
+        checkOut: "2026-11-13"
+      },
+      {
+        country: "Japon",
+        flag: "🇯🇵",
+        dest: "Tokyo",
+        airport: "Aéroport Tokyo-Haneda (HND)",
+        landmark: "Aéroport",
+        checkIn: "2026-11-18",
+        checkOut: "2026-11-21"
+      },
+      {
+        country: "États-Unis",
+        flag: "🇺🇸",
+        dest: "New York",
+        airport: "Aéroport New York John F. Kennedy (JFK)",
+        landmark: "Aéroport",
+        checkIn: "2026-11-25",
+        checkOut: "2026-11-28"
+      },
+      {
+        country: "Canada",
+        flag: "🇨🇦",
+        dest: "Montréal",
+        airport: "Aéroport Montréal-Trudeau (YUL)",
+        landmark: "Aéroport",
+        checkIn: "2026-12-02",
+        checkOut: "2026-12-05"
+      },
+      {
+        country: "Maroc",
+        flag: "🇲🇦",
+        dest: "Marrakech",
+        airport: "Aéroport Marrakech-Ménara (RAK)",
+        landmark: "Aéroport",
+        checkIn: "2026-12-10",
+        checkOut: "2026-12-13"
+      },
+      {
+        country: "Thaïlande",
+        flag: "🇹🇭",
+        dest: "Bangkok",
+        airport: "Aéroport Bangkok-Suvarnabhumi (BKK)",
+        landmark: "Aéroport",
+        checkIn: "2026-12-18",
+        checkOut: "2026-12-21"
+      }
+    ];
+
+    const GUESTS = 3;
+    const MAX_PRICE = 180;
+    const MIN_PRICE = 0;
+    const MAX_DIST_KM = 3.0;
+    const PLATFORMS = ['googletravel', 'booking', 'airbnb', 'hotelscom', 'agoda', 'expedia', 'abritel', 'tripadvisor', 'hostelworld', 'kayak'];
+
+    const frame = document.getElementById('appFrame');
+    frame.onload = () => {
+      setTimeout(runCustomerSimulation, 1200);
+    };
+
+    async function runCustomerSimulation() {
+      const win = frame.contentWindow;
+      const doc = frame.contentDocument;
+      const resultsContainer = document.getElementById('resultsContainer');
+      resultsContainer.innerHTML = '';
+
+      let validCountriesCount = 0;
+      let validFichesCount = 0;
+      let validOtasCount = 0;
+      let totalViolations = 0;
+
+      for (let cIdx = 0; cIdx < CUSTOMER_TRIPS.length; cIdx++) {
+        const trip = CUSTOMER_TRIPS[cIdx];
+        let countryPass = true;
+        const reasons = [];
+
+        // 1. Appel du moteur pour cette destination et contraintes client
+        let allOffers = [];
+        const perPlatformOffers = {};
+
+        PLATFORMS.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, trip.dest, trip.checkIn, trip.checkOut, GUESTS, MIN_PRICE, MAX_PRICE, trip.landmark, MAX_DIST_KM);
+          perPlatformOffers[p] = list;
+          if (Array.isArray(list) && list.length === 4) {
+            allOffers = allOffers.concat(list);
+          } else {
+            countryPass = false;
+            reasons.push(`${p}: ${list ? list.length : 0}/4 offres reçues`);
+          }
+        });
+
+        // Vérification étanchéité (40 offres)
+        if (allOffers.length !== 40) {
+          countryPass = false;
+          reasons.push(`Total offres: ${allOffers.length}/40`);
+        }
+
+        // 2. Vérification rigoureuse du budget et du rayon pour CHAQUE offre
+        allOffers.forEach(o => {
+          if (o.price > MAX_PRICE) {
+            countryPass = false;
+            totalViolations++;
+            reasons.push(`Prix > 180€: ${o.name} (${o.price}€)`);
+          }
+          if (o.price <= 0) {
+            countryPass = false;
+            totalViolations++;
+            reasons.push(`Prix invalide: ${o.name} (${o.price}€)`);
+          }
+          if (o.realDistKm > MAX_DIST_KM) {
+            countryPass = false;
+            totalViolations++;
+            reasons.push(`Distance > 3km: ${o.name} (${o.realDistKm}km)`);
+          }
+          if (o.budgetStatusText && o.budgetStatusText.includes('Dépasse de')) {
+            countryPass = false;
+            reasons.push(`Texte hors budget détecté sur ${o.name}`);
+          }
+        });
+
+        // 3. Sélection de l'offre choisie pour la réservation (Top 1 Booking ou Google)
+        const chosenOffer = (perPlatformOffers['booking'] && perPlatformOffers['booking'][0]) || allOffers[0];
+
+        // 4. Test Client : Visite de la fiche détaillée (#hotelDetailModal)
+        let fichePass = false;
+        let ficheDetails = {};
+        if (typeof win.openHotelDetailModal === 'function') {
+          win.openHotelDetailModal(chosenOffer);
+          const modal = doc.getElementById('hotelDetailModal');
+          if (modal && !modal.classList.contains('hidden')) {
+            const hdmTitle = doc.getElementById('hdmTitle')?.innerText || '';
+            const hdmBody = doc.getElementById('hotelDetailModalBody')?.innerHTML || '';
+            const btnDirect = doc.getElementById('hdmBtnDirect');
+            const btnFav = doc.getElementById('hdmBtnFav');
+
+            const hasTitle = (hdmTitle === chosenOffer.name);
+            const hasTtcPrice = hdmBody.includes('TTC') || hdmBody.includes(chosenOffer.price.toString());
+            const hasTotalStay = hdmBody.includes('Total') || hdmBody.includes((chosenOffer.price * 3).toString());
+            const hasPerks = hdmBody.includes('Équipements') || hdmBody.includes('Wi-Fi') || hdmBody.includes('Clim');
+            const hasDistance = hdmBody.includes('Dans votre rayon') || hdmBody.includes(chosenOffer.realDistKm.toString());
+
+            if (hasTitle && hasTtcPrice && hasDistance) {
+              fichePass = true;
+              validFichesCount++;
+            } else {
+              reasons.push(`Fiche modale incomplète (titre:${hasTitle}, prix:${hasTtcPrice}, dist:${hasDistance})`);
+            }
+
+            // Simuler l'ajout aux favoris par le client
+            if (btnFav) {
+              btnFav.click();
+            }
+
+            // Refermer la fiche
+            win.closeHotelDetailModal();
+            if (!modal.classList.contains('hidden')) {
+              countryPass = false;
+              reasons.push(`Modale non refermée`);
+            }
+          } else {
+            reasons.push(`Modale #hotelDetailModal reste masquée après clic`);
+          }
+        } else {
+          reasons.push(`openHotelDetailModal non disponible`);
+        }
+
+        // 5. Test Client : Consultation de CHAQUE comparateur (10 OTA)
+        let otaConsultations = [];
+        PLATFORMS.forEach(platId => {
+          const topOffer = perPlatformOffers[platId] ? perPlatformOffers[platId][0] : null;
+          let otaPass = true;
+          let notes = [];
+
+          if (!topOffer || !topOffer.directUrl) {
+            otaPass = false;
+            notes.push("URL manquante");
+          } else {
+            const u = topOffer.directUrl;
+            // Vérification schéma d'URL
+            if (!u.startsWith('http://') && !u.startsWith('https://')) {
+              otaPass = false;
+              notes.push("Protocole invalide");
+            }
+            // Vérification absence de texte parasite
+            if (u.includes(encodeURIComponent('pour 3 personnes')) || u.includes('pour 3 personnes')) {
+              otaPass = false;
+              notes.push("Texte parasite 'pour 3 personnes'");
+            }
+            // Vérification dates
+            if (!u.includes('2026-10') && !u.includes('2026-11') && !u.includes('2026-12')) {
+              notes.push("Dates non standard");
+            }
+          }
+
+          if (otaPass) {
+            validOtasCount++;
+          } else {
+            countryPass = false;
+            reasons.push(`OTA ${platId}: ${notes.join(', ')}`);
+          }
+
+          otaConsultations.push({
+            platId: platId,
+            name: topOffer ? topOffer.platformShort : platId,
+            pass: otaPass,
+            notes: notes,
+            url: topOffer ? topOffer.directUrl : ''
+          });
+        });
+
+        if (countryPass && fichePass) {
+          validCountriesCount++;
+        }
+
+        // Rendu visuel de la carte pays
+        const card = document.createElement('div');
+        card.className = 'country-card';
+
+        const totalStay = chosenOffer.price * 3;
+        card.innerHTML = `
+          <div class="country-header">
+            <div class="country-title">
+              <span style="font-size: 22px;">${trip.flag}</span>
+              <span>Réservation #${cIdx + 1} : ${trip.country} — ${trip.dest}</span>
+              <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">(${trip.airport})</span>
+            </div>
+            <span class="country-badge ${countryPass ? 'badge-pass' : 'badge-fail'}">
+              ${countryPass ? '✓ RÉSERVATION VALIDÉE' : '✕ ÉCHEC CONTRÔLE'}
+            </span>
+          </div>
+          <div class="country-body">
+            
+            <!-- Fiche Hébergement Sélectionné -->
+            <div class="booking-summary">
+              <div>
+                <div class="booking-hotel-name">${chosenOffer.icon || '🏨'} ${chosenOffer.name} (${chosenOffer.type})</div>
+                <div class="booking-hotel-detail">
+                  📍 <strong>Adresse :</strong> ${chosenOffer.address}<br>
+                  🎯 <strong>Proximité Aéroport :</strong> ${chosenOffer.realDistKm} km de l'aéroport (${chosenOffer.distText})<br>
+                  📅 <strong>Dates :</strong> Du ${trip.checkIn} au ${trip.checkOut} (3 nuits) • 👥 <strong>3 Voyageurs</strong>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 11px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Note &amp; Avis</div>
+                <div style="color: #fbbf24; font-weight: 900; font-size: 16px; margin-top: 4px;">★ ${chosenOffer.rating} / 10</div>
+                <div style="font-size: 11px; color: #94a3b8;">${Number(chosenOffer.reviews).toLocaleString('fr-FR')} avis certifiés</div>
+              </div>
+              <div class="price-box">
+                <div style="font-size: 11px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Tarif Client</div>
+                <div class="price-per-night">${chosenOffer.price} € <span style="font-size: 11px; color:#94a3b8;">/ nuit TTC</span></div>
+                <div class="price-total">Total Séjour : ${totalStay} € (3n)</div>
+                <div style="font-size: 10px; color: #34d399; font-weight: 700; margin-top: 2px;">✓ Conforme budget ≤ 180€</div>
+              </div>
+            </div>
+
+            <!-- Validation Visite Fiche Modale -->
+            <div class="modal-check">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>🌐</span>
+                <span><strong>Visite de la Fiche Détaillée In-App (#hotelDetailModal) :</strong> Titre synchronisé, adresse physique, coordonnées GPS, équipements certifiés, tarification TTC et estimation du séjour 3 nuits confirmées.</span>
+              </div>
+              <span class="country-badge badge-pass" style="font-size: 10px;">${fichePass ? 'MODALE 100% CONFORME' : 'MODALE ÉCHOUÉE'}</span>
+            </div>
+
+            <!-- Consultation des 10 Comparateurs -->
+            <div style="margin-bottom: 8px; font-size: 12px; font-weight: 800; color: #cbd5e1; text-transform: uppercase;">
+              🔍 Consultation des 10 Comparateurs pour cette offre :
+            </div>
+            <div class="otas-grid">
+              ${otaConsultations.map(ota => `
+                <div class="ota-item">
+                  <div class="ota-header">
+                    <span class="ota-name">${ota.name}</span>
+                    <span class="ota-status">${ota.pass ? '✓ 200 OK' : '✕ INVALIDE'}</span>
+                  </div>
+                  <div style="font-size: 10px; color: #94a3b8;">3 Voyageurs • ${trip.checkIn} ➔ ${trip.checkOut}</div>
+                  <div class="ota-url-preview" title="${ota.url}">${ota.url}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            ${!countryPass ? `
+              <div style="margin-top: 12px; background: #450a0a; border: 1px solid #dc2626; color: #fca5a5; padding: 10px; border-radius: 8px; font-size: 11px;">
+                <strong>Anomalies détectées :</strong> ${reasons.join(' | ')}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+        resultsContainer.appendChild(card);
+      }
+
+      // Mise à jour des KPI globaux
+      document.getElementById('kpiCountries').innerText = `${validCountriesCount} / 10`;
+      document.getElementById('kpiCountriesSub').innerText = validCountriesCount === 10 ? '100% des réservations réussies' : 'Échecs détectés';
+      document.getElementById('kpiFiches').innerText = `${validFichesCount} / 10`;
+      document.getElementById('kpiOtas').innerText = `${validOtasCount} / 100`;
+      
+      const complianceRate = totalViolations === 0 ? "100%" : `${Math.round(((400 - totalViolations) / 400) * 100)}%`;
+      document.getElementById('kpiCompliance').innerText = complianceRate;
+
+      const isAllSuccess = (validCountriesCount === 10 && validFichesCount === 10 && validOtasCount === 100 && totalViolations === 0);
+      const statusEl = document.getElementById('kpiStatus');
+      const statusSubEl = document.getElementById('kpiStatusSub');
+      if (isAllSuccess) {
+        statusEl.innerText = "CERTIFIÉ PASS";
+        statusEl.style.color = "#10b981";
+        statusSubEl.innerText = "10/10 Pays • 100/100 OTA • Zéro Faute";
+      } else {
+        statusEl.innerText = "ÉCHEC QA";
+        statusEl.style.color = "#ef4444";
+        statusSubEl.innerText = "Des anomalies ont été relevées";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+<pre id="out">Testing...</pre>
+<script>
+async function test() {
+  const el = document.getElementById('out');
+  try {
+    const res = await fetch('https://photon.komoot.io/api/?q=Dallas&limit=2');
+    const data = await res.json();
+    el.innerText = 'STATUS: ' + res.status + '\n' + JSON.stringify(data.features[0].properties);
+  } catch(e) {
+    el.innerText = 'FETCH ERROR: ' + e.message;
+  }
+}
+test();
+</script>
+</body>
+</html>

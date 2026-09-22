@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RentalListingList",
+  "type": "object",
+  "required": ["extracted_at", "user_max_budget_eur", "total_valid_listings", "listings"],
+  "properties": {
+    "extracted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "user_max_budget_eur": {
+      "type": "number"
+    },
+    "total_valid_listings": {
+      "type": "integer"
+    },
+    "search_status": {
+      "type": "string",
+      "enum": ["SUCCESS", "NO_MATCH_UNDER_BUDGET", "PARTIAL_MATCH"]
+    },
+    "listings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "price_per_night_eur", "url", "is_url_verified", "is_over_budget_suggestion"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": ["string", "null"] },
+          "location": { "type": ["string", "null"] },
+          "price_per_night_eur": { "type": ["number", "null"] },
+          "currency": { "type": "string", "default": "EUR" },
+          "url": { "type": "string", "format": "uri" },
+          "is_url_verified": { "type": "boolean" },
+          "http_status": { "type": ["integer", "null"] },
+          "is_over_budget_suggestion": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "over_budget_suggestions": {
+      "type": "array",
+      "items": { "$ref": "#/properties/listings/items" }
+    }
+  }
+}

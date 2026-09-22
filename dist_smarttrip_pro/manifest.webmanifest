@@ -1,0 +1,25 @@
+﻿{
+  "name": "TravelLingo Pro - Comparateur Hôtelier Mondial & Top 1 Coût/Prestation",
+  "short_name": "TravelLingo Pro",
+  "description": "Comparateur d'hébergements en 1 clic sur 10 plateformes mondiales avec géodésie piétonne de haute précision et sélection instantanée du Top 1 Coût & Prestation.",
+  "start_url": "./travel_dashboard.html",
+  "display": "standalone",
+  "background_color": "#f7f7f7",
+  "theme_color": "#58cc02",
+  "orientation": "any",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

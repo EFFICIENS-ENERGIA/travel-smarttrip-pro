@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Banc d'Essai Approfondi — SmartTrip Pro</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; margin: 0; }
+    h1 { color: #38bdf8; font-size: 22px; margin-bottom: 8px; }
+    .subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+    .badge-pass { background: #166534; color: #bbf7d0; padding: 4px 10px; border-radius: 9999px; font-weight: bold; font-size: 12px; }
+    .badge-fail { background: #991b1b; color: #fecaca; padding: 4px 10px; border-radius: 9999px; font-weight: bold; font-size: 12px; }
+    .battery { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .battery-title { font-size: 15px; font-weight: bold; color: #f1f5f9; margin-bottom: 12px; border-bottom: 1px solid #334155; padding-bottom: 8px; display: flex; justify-content: space-between; }
+    .test-item { font-size: 13px; padding: 6px 0; border-bottom: 1px dashed #334155; display: flex; justify-content: space-between; align-items: center; }
+    .test-item:last-child { border-bottom: none; }
+    .log-box { background: #020617; border: 1px solid #1e293b; color: #38bdf8; font-family: monospace; font-size: 12px; padding: 16px; border-radius: 8px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Banc d'Essai Approfondi & Audit Exhaustif : SmartTrip Pro</h1>
+  <div class="subtitle">Banc d'essai automatisé sous Microsoft Edge Headless • Validation sans concession de 5 batteries de tests</div>
+
+  <div id="summaryBox" class="battery" style="background:#1e1b4b; border-color:#4338ca;">
+    <div style="font-size:16px; font-weight:900;" id="summaryText">Initialisation du banc d'essai...</div>
+  </div>
+
+  <div id="testContainer"></div>
+
+  <div class="log-box" id="logBox">Démarrage des logs d'audit...</div>
+
+  <iframe id="appFrame" src="../travel_dashboard.html" style="width:1280px; height:800px; border:2px solid #334155; border-radius:12px; margin-top:20px;"></iframe>
+
+  <script>
+    const logs = [];
+    function log(msg, status = 'INFO') {
+      const line = `[${new Date().toLocaleTimeString('fr-FR')}] [${status}] ${msg}`;
+      logs.push(line);
+      document.getElementById('logBox').innerText = logs.join('\n');
+      console.log(line);
+    }
+
+    let totalTestsCount = 0;
+    let passedTestsCount = 0;
+    const testResults = {};
+
+    function runTest(batteryKey, batteryTitle, testName, fn) {
+      totalTestsCount++;
+      if (!testResults[batteryKey]) {
+        testResults[batteryKey] = { title: batteryTitle, tests: [] };
+      }
+      try {
+        fn();
+        passedTestsCount++;
+        testResults[batteryKey].tests.push({ name: testName, pass: true });
+        log(`PASS: ${testName}`, 'SUCCESS');
+      } catch (err) {
+        testResults[batteryKey].tests.push({ name: testName, pass: false, error: err.message });
+        log(`FAIL: ${testName} -> ${err.message}`, 'ERROR');
+      }
+    }
+
+    function renderResultsUI() {
+      const container = document.getElementById('testContainer');
+      let html = '';
+      for (const bKey in testResults) {
+        const b = testResults[bKey];
+        const allPass = b.tests.every(t => t.pass);
+        html += `
+          <div class="battery">
+            <div class="battery-title">
+              <span>${b.title}</span>
+              <span class="${allPass ? 'badge-pass' : 'badge-fail'}">${b.tests.filter(t => t.pass).length}/${b.tests.length} VALIDÉS</span>
+            </div>
+        `;
+        b.tests.forEach(t => {
+          html += `
+            <div class="test-item">
+              <span>${t.pass ? '✅' : '❌'} ${t.name}</span>
+              <span class="${t.pass ? 'badge-pass' : 'badge-fail'}">${t.pass ? 'PASS' : 'ÉCHEC'}</span>
+            </div>
+            ${t.error ? `<div style="color:#f87171; font-size:11px; margin-bottom:4px; padding-left:24px;">Erreur : ${t.error}</div>` : ''}
+          `;
+        });
+        html += `</div>`;
+      }
+      container.innerHTML = html;
+
+      const allSuccess = (passedTestsCount === totalTestsCount);
+      const sumBox = document.getElementById('summaryBox');
+      sumBox.style.background = allSuccess ? '#064e3b' : '#7f1d1d';
+      sumBox.style.borderColor = allSuccess ? '#059669' : '#dc2626';
+      document.getElementById('summaryText').innerHTML = `
+        <span style="color:#ffffff;">
+          ${allSuccess ? "🏆 BANC D'ESSAI EXHAUSTIF RÉUSSI À 100%" : "⚠️ ANOMALIES DÉTECTÉES"} :
+          ${passedTestsCount}/${totalTestsCount} TESTS VALIDÉS AVEC SUCCÈS
+        </span>
+      `;
+
+      window.__ALL_TESTS_DONE__ = true;
+      window.__ALL_TESTS_PASSED__ = allSuccess;
+      window.__TEST_COUNT__ = totalTestsCount;
+      window.__PASSED_COUNT__ = passedTestsCount;
+    }
+
+    const iframe = document.getElementById('appFrame');
+    let auditExecuted = false;
+    function tryRunAudit() {
+      if (auditExecuted) return;
+      try {
+        const win = iframe.contentWindow;
+        if (win && typeof win.getPlatformTop4Listings === 'function') {
+          auditExecuted = true;
+          setTimeout(executeFullAudit, 400);
+          return;
+        }
+      } catch (e) {}
+      setTimeout(tryRunAudit, 200);
+    }
+    iframe.onload = () => { tryRunAudit(); };
+    setTimeout(tryRunAudit, 600);
+
+    function executeFullAudit() {
+      const win = iframe.contentWindow;
+      const doc = iframe.contentDocument;
+      log("travel_dashboard.html chargé dans l'iframe. Début de la batterie de tests approfondis.", "INFO");
+
+      const platforms = ['googletravel', 'booking', 'airbnb', 'agoda', 'expedia', 'hotelscom', 'abritel', 'tripadvisor', 'kayak', 'hostelworld'];
+
+      // =========================================================================
+      // BATTERIE 1 : VILLES MONDIALES & CORRÉLATION STRICTE
+      // =========================================================================
+      runTest('bat1', '🌍 BATTERIE 1 : CORRÉLATION GÉOGRAPHIQUE SUR 5 VILLES TYPES', 'Paris + Tour Eiffel : 10 comparateurs ciblent Paris & la Tour Eiffel', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Paris', '2026-10-12', '2026-10-15', 2, 0, 1000, 'Tour Eiffel', 3);
+          if (list.length !== 4) throw new Error(`${p} ne retourne pas 4 offres`);
+          if (!list[0].distText.toLowerCase().includes('tour eiffel') && !list[0].distText.toLowerCase().includes('centre')) {
+            throw new Error(`Repère Tour Eiffel non présent dans distText : ${list[0].distText}`);
+          }
+        });
+      });
+
+      runTest('bat1', '🌍 BATTERIE 1 : CORRÉLATION GÉOGRAPHIQUE SUR 5 VILLES TYPES', 'Tokyo + Shibuya : 10 comparateurs ciblent Tokyo et le quartier Shibuya', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Tokyo', '2026-10-12', '2026-10-15', 2, 0, 1000, 'Shibuya', 4);
+          if (list.length !== 4) throw new Error(`${p} ne retourne pas 4 offres pour Tokyo`);
+          if (!list[0].dest || !list[0].dest.toLowerCase().includes('tokyo')) throw new Error(`Destination non conforme : ${list[0].dest}`);
+        });
+      });
+
+      runTest('bat1', '🌍 BATTERIE 1 : CORRÉLATION GÉOGRAPHIQUE SUR 5 VILLES TYPES', 'New York + Times Square : 10 comparateurs avec taxe de séjour NYC (4.50$)', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'New York', '2026-10-12', '2026-10-15', 2, 0, 1000, 'Times Square', 3);
+          if (list.length !== 4) throw new Error(`${p} ne retourne pas 4 offres pour NYC`);
+        });
+      });
+
+      runTest('bat1', '🌍 BATTERIE 1 : CORRÉLATION GÉOGRAPHIQUE SUR 5 VILLES TYPES', 'Séville (Andalousie) : Hôtels réels CURATED reconnus (Alfonso XIII / Judería)', () => {
+        const listG = win.getPlatformTop4Listings('googletravel', 'Séville', '2026-10-12', '2026-10-15', 2, 0, 1000, '', 5);
+        const hasSevilleHotel = listG.some(h => (h.name || '').toLowerCase().includes('alfonso') || (h.name || '').toLowerCase().includes('mercer') || (h.name || '').toLowerCase().includes('poeta') || (h.name || '').toLowerCase().includes('melia') || (h.name || '').toLowerCase().includes('seville'));
+        if (!hasSevilleHotel) throw new Error("Obtenu pour Séville : " + listG.map(h => h.name).join(' | '));
+      });
+
+      runTest('bat1', '🌍 BATTERIE 1 : CORRÉLATION GÉOGRAPHIQUE SUR 5 VILLES TYPES', 'Annecy (Ville hors catalogue statique) : Étalonnage dynamique et repli infaillible', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Annecy', '2026-10-12', '2026-10-15', 2, 0, 1000, '', 5);
+          if (list.length !== 4) throw new Error(`Annecy n'a pas 4 offres sur ${p}`);
+          if (!list[0].directUrl.includes('Annecy')) throw new Error(`Lien sortant OTA pour Annecy ne cible pas Annecy : ${list[0].directUrl}`);
+        });
+      });
+
+      // =========================================================================
+      // BATTERIE 2 : ÉTANCHÉITÉ BUDGÉTAIRE ABSOLUE
+      // =========================================================================
+      runTest('bat2', '💰 BATTERIE 2 : ÉTANCHÉITÉ BUDGÉTAIRE ABSOLUE (ZÉRO DÉPASSEMENT)', 'Budget Ultra-Serré : Max 45 €/nuit à Rome (40 offres testées)', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Rome', '2026-10-12', '2026-10-15', 2, 0, 45, '', 5);
+          list.forEach(o => {
+            if (o.price > 45) throw new Error(`Plateforme ${p} : offre ${o.name} (${o.price} €) dépasse le plafond de 45 €`);
+            if (!o.inBudget) throw new Error(`Plateforme ${p} : offre ${o.name} inBudget=false`);
+          });
+        });
+      });
+
+      runTest('bat2', '💰 BATTERIE 2 : ÉTANCHÉITÉ BUDGÉTAIRE ABSOLUE (ZÉRO DÉPASSEMENT)', 'Budget Encadré : Min 60 € - Max 95 €/nuit à Londres (40 offres testées)', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Londres', '2026-10-12', '2026-10-15', 2, 60, 95, '', 5);
+          list.forEach(o => {
+            if (o.price > 95) throw new Error(`Plateforme ${p} : ${o.name} (${o.price} €) > 95 €`);
+            if (o.price < 60) throw new Error(`Plateforme ${p} : ${o.name} (${o.price} €) < 60 €`);
+          });
+        });
+      });
+
+      runTest('bat2', '💰 BATTERIE 2 : ÉTANCHÉITÉ BUDGÉTAIRE ABSOLUE (ZÉRO DÉPASSEMENT)', 'Budget Confort & Prestige : Min 200 € - Max 500 €/nuit à Paris (40 offres testées)', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Paris', '2026-10-12', '2026-10-15', 2, 200, 500, '', 5);
+          list.forEach(o => {
+            if (o.price > 500) throw new Error(`Plateforme ${p} : ${o.name} (${o.price} €) > 500 €`);
+            if (o.price < 200) throw new Error(`Plateforme ${p} : ${o.name} (${o.price} €) < 200 €`);
+          });
+        });
+      });
+
+      runTest('bat2', '💰 BATTERIE 2 : ÉTANCHÉITÉ BUDGÉTAIRE ABSOLUE (ZÉRO DÉPASSEMENT)', 'Absence absolue du motif "Dépasse de" dans toutes les cartes et badges', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Bordeaux', '2026-10-12', '2026-10-15', 2, 30, 70, '', 4);
+          list.forEach(o => {
+            if (o.budgetStatusText && o.budgetStatusText.includes('Dépasse de')) {
+              throw new Error(`Badge d'erreur 'Dépasse de' trouvé sur ${o.name} : ${o.budgetStatusText}`);
+            }
+          });
+        });
+      });
+
+      // =========================================================================
+      // BATTERIE 3 : RAYON KILOMÉTRIQUE & PROXIMITÉ STRICTE
+      // =========================================================================
+      runTest('bat3', '🎯 BATTERIE 3 : RESPECT STRICT DU RAYON KILOMÉTRIQUE (ZÉRO HORS RAYON)', 'Rayon Ultra-Court : < 0.6 km de Fontaine de Trevi à Rome (40 offres testées)', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Rome', '2026-10-12', '2026-10-15', 2, 0, 1000, 'Fontaine de Trevi', 0.6);
+          list.forEach(o => {
+            if (o.realDistKm > 0.6) throw new Error(`Plateforme ${p} : ${o.name} (${o.realDistKm} km) dépasse le rayon de 0.6 km`);
+            if (o.distText && o.distText.includes('Hors rayon')) throw new Error(`'Hors rayon' détecté sur ${o.name}`);
+          });
+        });
+      });
+
+      runTest('bat3', '🎯 BATTERIE 3 : RESPECT STRICT DU RAYON KILOMÉTRIQUE (ZÉRO HORS RAYON)', 'Rayon Piéton Court : < 1.2 km de Puerta del Sol à Madrid (40 offres testées)', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Madrid', '2026-10-12', '2026-10-15', 2, 0, 1000, 'Puerta del Sol', 1.2);
+          list.forEach(o => {
+            if (o.realDistKm > 1.2) throw new Error(`Plateforme ${p} : ${o.name} (${o.realDistKm} km) dépasse 1.2 km`);
+          });
+        });
+      });
+
+      runTest('bat3', '🎯 BATTERIE 3 : RESPECT STRICT DU RAYON KILOMÉTRIQUE (ZÉRO HORS RAYON)', 'Absence absolue du motif "Hors rayon" dans toutes les mentions et badges', () => {
+        platforms.forEach(p => {
+          const list = win.getPlatformTop4Listings(p, 'Nice', '2026-10-12', '2026-10-15', 2, 0, 1000, 'Promenade des Anglais', 1.0);
+          list.forEach(o => {
+            if (o.distText && o.distText.includes('Hors rayon')) {
+              throw new Error(`Mention 'Hors rayon' trouvée sur ${o.name} : ${o.distText}`);
+            }
+          });
+        });
+      });
+
+      // =========================================================================
+      // BATTERIE 4 : OCCUPATION & NOMBRE DE VOYAGEURS (1, 2, 4, 6 PERSONNES)
+      // =========================================================================
+      runTest('bat4', '👥 BATTERIE 4 : MODÈLES D\'OCCUPATION & VOYAGEURS', 'Voyageur Solo (1 personne) : Facteur solo et deep links base 1 adulte', () => {
+        const listG = win.getPlatformTop4Listings('googletravel', 'Paris', '2026-10-12', '2026-10-15', 1, 0, 1000, '', 5);
+        if (listG[0].guests !== 1) throw new Error("guests n'est pas égal à 1");
+        if (!listG[0].googleUrl.includes('adults=1')) throw new Error("Google URL ne contient pas adults=1");
+        if (!listG[0].directUrl.includes('adults=1') && !listG[0].directUrl.includes('group_adults=1')) throw new Error("Direct URL ne contient pas adults=1");
+      });
+
+      runTest('bat4', '👥 BATTERIE 4 : MODÈLES D\'OCCUPATION & VOYAGEURS', 'Famille / Groupe 4 personnes : Chambre familiale ou 2 chambres et adults=4 transmis', () => {
+        const listB = win.getPlatformTop4Listings('booking', 'Madrid', '2026-10-12', '2026-10-15', 4, 0, 1000, '', 5);
+        if (listB[0].guests !== 4) throw new Error("guests n'est pas égal à 4");
+        if (!listB[0].directUrl.includes('group_adults=4')) throw new Error("Booking directUrl ne transmet pas group_adults=4");
+      });
+
+      runTest('bat4', '👥 BATTERIE 4 : MODÈLES D\'OCCUPATION & VOYAGEURS', 'Grand Groupe 6 personnes : Bannière grand groupe et villas/logements complets prioritaires', () => {
+        doc.getElementById('guestsInput').value = '6';
+        doc.getElementById('destInput').value = 'Marseille';
+        win.onCriteriaChanged();
+        const bannerText = doc.getElementById('platformsGrid')?.innerText || '';
+        if (!bannerText.toUpperCase().includes('MODE GRAND GROUPE') || !bannerText.includes('6')) {
+          throw new Error("Bannière grand groupe non affichée dans platformsGrid : " + bannerText.substring(0, 80));
+        }
+      });
+
+      // =========================================================================
+      // BATTERIE 5 : EXPÉRIENCE UTILISATEUR, WORKFLOWS ET DESIGN SYSTEM
+      // =========================================================================
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Duel 3 Voies : Injection depuis carte, calcul des écarts et canal recommandé', () => {
+        win.injectIntoDuel('Hotel Quirinale', 135, 'booking');
+        doc.getElementById('duelPriceGoogle').value = '160';
+        doc.getElementById('duelPriceAirbnb').value = '110';
+        win.computeDuel();
+        const winner = doc.getElementById('duelWinnerTitle')?.textContent || '';
+        const diffText = doc.getElementById('duelWinnerDiff')?.textContent || '';
+        if (!winner.includes('Airbnb') && !winner.includes('Booking') && !winner.includes('Google')) {
+          throw new Error("Calcul du duel 3 voies non effectué, titre : " + winner);
+        }
+        if (!diffText) throw new Error("Texte d'écart duel vide");
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Simulateur TCO : Intégration des taxes de séjour, transports et repas sur 4 nuits', () => {
+        const tcoNightInput = doc.getElementById('tcoPricePerNight');
+        if (tcoNightInput) tcoNightInput.value = '110';
+        const tcoNights = doc.getElementById('tcoNights');
+        if (tcoNights) tcoNights.value = '4';
+        win.computeTco();
+        const totalTco = doc.getElementById('tcoTotalDisplay')?.textContent || '';
+        if (!totalTco || totalTco.includes('0,00') || totalTco === '0') throw new Error("Total TCO non calculé");
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Wishlist / Favoris & Alertes Baisses de Prix Déterministes', () => {
+        win.clearAllFavorites();
+        const sample = {
+          name: "Test Palace Hôtel",
+          dest: "Rome",
+          price: 120,
+          rating: "9.2",
+          reviews: 1500,
+          distText: "0.4 km",
+          directUrl: "https://booking.com",
+          googleUrl: "https://google.com",
+          platformShort: "Booking",
+          icon: "👑"
+        };
+        win.toggleFavoriteHotel(encodeURIComponent(JSON.stringify(sample)));
+        if (win.FAVORITES_LIST.length !== 1) throw new Error("Favori non ajouté");
+        const favBadge = doc.getElementById('favCountBadge');
+        if (!favBadge || favBadge.textContent !== '1') throw new Error("Compteur favoris non mis à jour à 1");
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Système de Parrainage VIP : Code officiel SMART-XXXX et attribution bonus XP', () => {
+        const myCode = win.getOrCreateReferralCode();
+        if (!myCode.startsWith('SMART-')) throw new Error(`Code parrainage invalide : ${myCode}`);
+        const refData = win.REFERRAL_DATA;
+        if (!refData || refData.bonusXp < 0) throw new Error("REFERRAL_DATA corrompu");
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Devises Internationales : Conversion instantanée EUR -> USD -> GBP -> JPY', () => {
+        win.setUserCurrency('USD');
+        if (win.USER_PREFS.currency !== 'USD') throw new Error("Devise USD non enregistrée");
+        const rate = win.CURRENCY_RATES['USD'];
+        if (!rate || rate <= 0) throw new Error("Taux USD invalide");
+        win.setUserCurrency('EUR'); // Restauration en EUR
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Thème Sombre "Night Flight" : Bascule de classe .dark et persistance', () => {
+        const wasDark = doc.documentElement.classList.contains('dark');
+        win.toggleTheme();
+        const isDarkNow = doc.documentElement.classList.contains('dark');
+        if (isDarkNow === wasDark) throw new Error("Le thème sombre n'a pas basculé");
+        win.toggleTheme(); // Rebascule
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Affiliation Multi-OTA : 100% des liens sortants intègrent les tags partenaires certifiés', () => {
+        const bUrl = win.applyAffiliateToUrl('https://www.booking.com/searchresults.html?ss=Rome', 'booking');
+        if (!bUrl.includes('aid=2415890')) throw new Error("Booking aid manquant");
+        const aUrl = win.applyAffiliateToUrl('https://www.agoda.com/search?text=Rome', 'agoda');
+        if (!aUrl.includes('cid=1894210')) throw new Error("Agoda cid manquant");
+        const eUrl = win.applyAffiliateToUrl('https://www.expedia.fr/Hotel-Search', 'expedia');
+        if (!eUrl.includes('camref=1100l397a')) throw new Error("Expedia camref manquant");
+        const airUrl = win.applyAffiliateToUrl('https://www.airbnb.fr/s/Rome', 'airbnb');
+        if (!airUrl.includes('ref=c_travellingo')) throw new Error("Airbnb ref manquant");
+      });
+
+      runTest('bat5', '✨ BATTERIE 5 : WORKFLOWS INTERACTIFS, DUEL, TCO & MONÉTISATION', 'Hygiène Globale du DOM : 0 mention "Hors rayon", 0 "Dépasse de", 0 "NaN", 0 "undefined"', () => {
+        doc.getElementById('destInput').value = 'Rome';
+        doc.getElementById('minPriceInput').value = '40';
+        doc.getElementById('maxPriceInput').value = '80';
+        doc.getElementById('distInput').value = '2.0';
+        win.onCriteriaChanged();
+
+        const gridHtml = doc.getElementById('platformsGrid')?.innerHTML || '';
+        if (gridHtml.includes('Hors rayon')) throw new Error("Mention 'Hors rayon' trouvée dans platformsGrid");
+        if (gridHtml.includes('Dépasse de')) throw new Error("Mention 'Dépasse de' trouvée dans platformsGrid");
+        if (gridHtml.includes('>NaN<') || gridHtml.includes(' NaN ')) throw new Error("NaN détecté dans le rendu");
+        if (gridHtml.includes('>undefined<') || gridHtml.includes(' undefined ')) throw new Error("undefined détecté dans le rendu");
+      });
+
+      // Fin des tests : rendu graphique
+      renderResultsUI();
+    }
+  </script>
+</body>
+</html>

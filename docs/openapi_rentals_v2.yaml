@@ -1,0 +1,163 @@
+openapi: 3.0.3
+info:
+  title: API de Recherche & Extraction de Logements Déterministe
+  description: |
+    Spécification officielle du moteur d'extraction typée sans hallucination de `travel_dashboard`.
+    Conforme aux règles de filtrage déterministe (Règle 02 & Règle 13) et au standard Zéro-Hallucination v2.
+  version: 2.1.0
+  contact:
+    name: Équipe Ingénierie Antigravity
+servers:
+  - url: http://localhost:8080/api/v2
+    description: Serveur local de développement
+
+paths:
+  /rentals/search:
+    post:
+      summary: Recherche et extraction d'hébergements avec filtrage strict
+      description: |
+        Recherche des annonces de logements et applique impérativement le plafond budgétaire dans le code.
+        Rejette toute URL morte (404/timeout).
+      operationId: searchRentals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - destination
+                - checkin_date
+                - checkout_date
+                - guests_count
+                - user_max_budget_eur
+              properties:
+                destination:
+                  type: string
+                  example: "Milan"
+                checkin_date:
+                  type: string
+                  format: date
+                  example: "2026-09-30"
+                checkout_date:
+                  type: string
+                  format: date
+                  example: "2026-10-02"
+                guests_count:
+                  type: integer
+                  minimum: 1
+                  example: 3
+                user_max_budget_eur:
+                  type: number
+                  minimum: 1.0
+                  example: 150.0
+                currency:
+                  type: string
+                  default: "EUR"
+                  example: "EUR"
+      responses:
+        '200':
+          description: Résultats qualifiés sous le budget avec URLs vérifiées
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalSearchResponse'
+        '400':
+          description: Paramètres invalides ou schéma JSON non conforme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Violation d'intégrité ou tentative d'injection non filtrée
+
+components:
+  schemas:
+    RentalSearchResponse:
+      type: object
+      required:
+        - extracted_at
+        - user_max_budget_eur
+        - total_valid_listings
+        - search_status
+        - listings
+        - over_budget_suggestions
+      properties:
+        extracted_at:
+          type: string
+          format: date-time
+          example: "2026-09-12T10:30:00Z"
+        user_max_budget_eur:
+          type: number
+          example: 150.0
+        total_valid_listings:
+          type: integer
+          example: 2
+        search_status:
+          type: string
+          enum: ["SUCCESS", "NO_MATCH_UNDER_BUDGET", "PARTIAL_MATCH"]
+          example: "SUCCESS"
+        listings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalListing'
+        over_budget_suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalListing'
+
+    RentalListing:
+      type: object
+      required:
+        - id
+        - title
+        - price_per_night_eur
+        - url
+        - is_url_verified
+        - is_over_budget_suggestion
+      properties:
+        id:
+          type: string
+          example: "item_01"
+        title:
+          type: string
+          nullable: true
+          example: "Hotel Duomo Milano"
+        location:
+          type: string
+          nullable: true
+          example: "Milan, Italie"
+        price_per_night_eur:
+          type: number
+          nullable: true
+          example: 120.0
+        currency:
+          type: string
+          example: "EUR"
+        url:
+          type: string
+          format: uri
+          example: "https://www.google.com/travel/hotels?q=Duomo%20Milano"
+        is_url_verified:
+          type: boolean
+          example: true
+        http_status:
+          type: integer
+          nullable: true
+          example: 200
+        is_over_budget_suggestion:
+          type: boolean
+          example: false
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "INVALID_BUDGET_PARAMETER"
+        message:
+          type: string
+          example: "Le budget maximal doit être un nombre strictement positif."

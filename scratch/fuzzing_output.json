@@ -1,0 +1,20 @@
+{
+  "total_valid_listings": 1,
+  "over_budget_suggestions": [],
+  "extracted_at": "2026-09-13T20:57:44Z",
+  "user_max_budget_eur": 120.0,
+  "search_status": "SUCCESS",
+  "listings": [
+    {
+      "http_status": 200,
+      "id": "fuzz_xss_script",
+      "price_per_night_eur": 110.0,
+      "is_over_budget_suggestion": false,
+      "is_url_verified": true,
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano",
+      "location": "Milan &lt;img src=x onerror=alert(1)&gt;",
+      "title": "&lt;script&gt;alert(&#x27;XSS_ATTACK&#x27;)&lt;/script&gt;"
+    }
+  ]
+}

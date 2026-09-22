@@ -1,0 +1,53 @@
+{
+  "description": "Matrice de test multi-cas pour le moteur d'extraction et de recherche de logements",
+  "listings": [
+    {
+      "id": "item_01_valid_under_budget",
+      "title": "Hotel Duomo Milano",
+      "location": "Milan, Italie",
+      "price_per_night_eur": 120.0,
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Duomo%20Milano&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr"
+    },
+    {
+      "id": "item_02_valid_zero_hallucination_nulls",
+      "title": null,
+      "location": null,
+      "price_per_night_eur": 135.0,
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=Milano%20Centrale&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr"
+    },
+    {
+      "id": "item_03_over_budget_within_5pct",
+      "title": "Grand Hotel Milan Prestige",
+      "location": "Milan, Italie",
+      "price_per_night_eur": 154.0,
+      "currency": "EUR",
+      "url": "https://www.kayak.fr/hotels/Milan/2026-09-30/2026-10-02/3adults"
+    },
+    {
+      "id": "item_04_over_budget_far_exceeded",
+      "title": "Villa Royale San Siro Luxury Suite",
+      "location": "Milan, Italie",
+      "price_per_night_eur": 280.0,
+      "currency": "EUR",
+      "url": "https://www.google.com/travel/hotels?q=San%20Siro%20Milan&dates=2026-09-30%2C2026-10-02&adults=3&hl=fr"
+    },
+    {
+      "id": "item_05_broken_url_404",
+      "title": "Aparthotel Broken Link 404",
+      "location": "Milan, Italie",
+      "price_per_night_eur": 85.0,
+      "currency": "EUR",
+      "url": "https://httpstat.us/404"
+    },
+    {
+      "id": "item_06_unreachable_timeout",
+      "title": "Residenza Timeout Inaccessible",
+      "location": "Milan, Italie",
+      "price_per_night_eur": 95.0,
+      "currency": "EUR",
+      "url": "http://10.255.255.1/non-existent-endpoint"
+    }
+  ]
+}

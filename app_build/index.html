@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Application PWA Task Manager Offline-First avec persistance IndexedDB sécurisée">
+  <meta name="theme-color" content="#2563eb">
+  <title>PWA Task Manager — Offline-First</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- EN-TÊTE PRINCIPALE -->
+    <header role="banner">
+      <div class="header-top">
+        <h1>✅ Task Manager</h1>
+        <div class="header-actions">
+          <span id="connectionStatus" class="status-badge status-online" role="status" aria-live="polite">🟢 En Ligne</span>
+          <button id="themeToggle" class="btn-icon" aria-label="Basculer le thème visuel sombre ou clair">🌙 Mode Sombre</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- FORMULAIRE D'AJOUT DE TÂCHE -->
+    <main role="main">
+      <section class="card-form" aria-labelledby="formTitle">
+        <h2 id="formTitle" style="font-size: 1.15rem; margin-bottom: 1rem;">➕ Ajouter une nouvelle tâche</h2>
+        <form id="taskForm" novalidate>
+          <div class="form-group">
+            <label for="taskTitle">Titre de la tâche <span style="color: var(--danger)">*</span></label>
+            <input type="text" id="taskTitle" name="title" required placeholder="Ex: Rédiger le rapport d'audit" maxlength="120">
+          </div>
+
+          <div class="form-group">
+            <label for="taskDesc">Description / Notes</label>
+            <textarea id="taskDesc" name="description" rows="2" placeholder="Détails optionnels..." maxlength="500"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="taskPriority">Priorité</label>
+              <select id="taskPriority" name="priority">
+                <option value="low">Basse</option>
+                <option value="medium" selected>Moyenne</option>
+                <option value="high">Haute</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="taskDueDate">Date d'échéance</label>
+              <input type="date" id="taskDueDate" name="dueDate">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="btnSubmitTask">Enregistrer la tâche</button>
+        </form>
+      </section>
+
+      <!-- BARRE DE FILTRAGE ET DE TRI -->
+      <section class="filter-bar" aria-label="Filtres des tâches">
+        <div class="filter-group">
+          <label for="filterStatus" style="margin-bottom: 0; font-size: 0.85rem;">Statut :</label>
+          <select id="filterStatus" aria-label="Filtrer par statut">
+            <option value="all">Toutes</option>
+            <option value="pending">En cours</option>
+            <option value="completed">Terminées</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterPriority" style="margin-bottom: 0; font-size: 0.85rem;">Priorité :</label>
+          <select id="filterPriority" aria-label="Filtrer par priorité">
+            <option value="all">Toutes</option>
+            <option value="high">Haute</option>
+            <option value="medium">Moyenne</option>
+            <option value="low">Basse</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- LISTE DES TÂCHES -->
+      <section aria-labelledby="taskListTitle">
+        <h2 id="taskListTitle" class="sr-only" style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Mes Tâches</h2>
+        <div id="taskList" class="task-list" role="region" aria-live="polite">
+          <!-- Injecté dynamiquement par app.js -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Aucune tâche trouvée</p>
+          <p style="font-size: 0.9rem;">Ajoutez une nouvelle tâche ci-dessus ou modifiez vos filtres de recherche.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- NOTIFICATION VISUELLE ET ARIA LIVE -->
+    <div id="statusNotification" class="notification" role="status" aria-live="polite"></div>
+  </div>
+
+  <!-- SCRIPTS APPLICATION -->
+  <script src="./db.js"></script>
+  <script src="./app.js"></script>
+
+  <!-- ENREGISTREMENT DU SERVICE WORKER (PWA) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('[PWA] Service Worker actif, scope:', registration.scope);
+          })
+          .catch(error => {
+            console.warn('[PWA] Échec enregistrement Service Worker:', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

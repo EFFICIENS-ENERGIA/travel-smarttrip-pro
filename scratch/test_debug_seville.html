@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+  <iframe id="f" src="../travel_dashboard.html"></iframe>
+  <div id="res">...</div>
+  <script>
+    const f = document.getElementById('f');
+    f.onload = () => {
+      setTimeout(() => {
+        try {
+          const win = f.contentWindow;
+          const list = win.getPlatformTop4Listings('googletravel', 'SÃ©ville', '2026-10-12', '2026-10-15', 2, 0, 1000, '', 5);
+          document.getElementById('res').innerText = JSON.stringify(list.map(x => x.name), null, 2);
+        } catch(e) {
+          document.getElementById('res').innerText = 'ERROR: ' + e.message;
+        }
+      }, 800);
+    };
+  </script>
+</body>
+</html>

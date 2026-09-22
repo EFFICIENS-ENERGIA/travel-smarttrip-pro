@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Stress Test Budget & Rayon</title></head>
+<body>
+  <iframe id="appFrame" src="../travel_dashboard.html" style="width:1200px; height:900px;"></iframe>
+  <div id="output">...</div>
+  <script>
+    const iframe = document.getElementById('appFrame');
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          const win = iframe.contentWindow;
+          const doc = iframe.contentDocument;
+          const platforms = ['googletravel', 'booking', 'airbnb', 'agoda', 'expedia', 'hotelscom', 'abritel', 'tripadvisor', 'kayak', 'hostelworld'];
+          const errors = [];
+
+          // SCÃ‰NARIO 1 : Rome, Max 65 â‚¬/n, Rayon < 1.5 km
+          platforms.forEach(p => {
+            const list = win.getPlatformTop4Listings(p, 'Rome', '2026-10-12', '2026-10-15', 2, 0, 65, 'ColisÃ©e', 1.5);
+            if (list.length !== 4) errors.push(ScÃ©nario 1 -  : attendu 4 offres, obtenu  + list.length);
+            list.forEach(o => {
+              if (o.price > 65) errors.push(ScÃ©nario 1 -  :  ( â‚¬) > 65 â‚¬);
+              if (o.realDistKm > 1.5) errors.push(ScÃ©nario 1 -  :  ( km) > 1.5 km);
+              if (o.distText && o.distText.includes('Hors rayon')) errors.push(ScÃ©nario 1 -  : 'Hors rayon' dÃ©tectÃ© dans );
+              if (o.budgetStatusText && o.budgetStatusText.includes('DÃ©passe de')) errors.push(ScÃ©nario 1 -  : 'DÃ©passe de' dÃ©tectÃ© dans );
+            });
+          });
+
+          // SCÃ‰NARIO 2 : Paris, Min 40 â‚¬, Max 70 â‚¬, Rayon < 1.0 km
+          platforms.forEach(p => {
+            const list = win.getPlatformTop4Listings(p, 'Paris', '2026-10-12', '2026-10-15', 2, 40, 70, 'Tour Eiffel', 1.0);
+            if (list.length !== 4) errors.push(ScÃ©nario 2 -  : attendu 4 offres, obtenu  + list.length);
+            list.forEach(o => {
+              if (o.price > 70) errors.push(ScÃ©nario 2 -  :  ( â‚¬) > 70 â‚¬);
+              if (o.price < 40) errors.push(ScÃ©nario 2 -  :  ( â‚¬) < 40 â‚¬);
+              if (o.realDistKm > 1.0) errors.push(ScÃ©nario 2 -  :  ( km) > 1.0 km);
+            });
+          });
+
+          // SCÃ‰NARIO 3 : Bordeaux, Max 50 â‚¬, Rayon < 2.0 km
+          platforms.forEach(p => {
+            const list = win.getPlatformTop4Listings(p, 'Bordeaux', '2026-10-12', '2026-10-15', 2, 0, 50, '', 2.0);
+            if (list.length !== 4) errors.push(ScÃ©nario 3 -  : attendu 4 offres, obtenu  + list.length);
+            list.forEach(o => {
+              if (o.price > 50) errors.push(ScÃ©nario 3 -  :  ( â‚¬) > 50 â‚¬);
+              if (o.realDistKm > 2.0) errors.push(ScÃ©nario 3 -  :  ( km) > 2.0 km);
+            });
+          });
+
+          // SCÃ‰NARIO 4 : Rendu rÃ©el de l'UI avec budget 60 â‚¬ et rayon 1.5 km
+          doc.getElementById('destInput').value = 'Rome';
+          doc.getElementById('minPriceInput').value = '0';
+          doc.getElementById('maxPriceInput').value = '60';
+          doc.getElementById('distInput').value = '1.5';
+          win.onCriteriaChanged();
+
+          const bodyText = doc.body.innerText;
+          if (bodyText.includes('Hors rayon')) {
+            errors.push("Le texte 'Hors rayon' apparaÃ®t dans le DOM rendu de la page !");
+          }
+          if (bodyText.includes('DÃ©passe de')) {
+            errors.push("Le texte 'DÃ©passe de' apparaÃ®t dans le DOM rendu de la page !");
+          }
+
+          if (errors.length === 0) {
+            document.getElementById('output').innerText = "SUCCESS: 120 OFFRES TESTÃ‰ES â€¢ 100% CONFORMES BUDGET & RAYON â€¢ 0 HORS RAYON â€¢ 0 DÃ‰PASSEMENT";
+          } else {
+            document.getElementById('output').innerText = "FAIL (" + errors.length + " erreurs) :\n" + errors.slice(0, 10).join("\n");
+          }
+        } catch(ex) {
+          document.getElementById('output').innerText = "EXCEPTION: " + ex.message;
+        }
+      }, 1500);
+    };
+  </script>
+</body>
+</html>

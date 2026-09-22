@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Banc d'Essai QA : Moteur Universel & Résolution Dallas</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b0f19; color: #f8fafc; padding: 24px; margin: 0; }
+    h1 { color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+    .subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+    .card { background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+    .test-box { background: #0f172a; border-radius: 10px; padding: 14px; border: 1px solid #334155; }
+    .test-box.pass { border-color: #10b981; }
+    .test-box.fail { border-color: #ef4444; background: #450a0a; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+    .badge-pass { background: #065f46; color: #6ee7b7; }
+    .badge-fail { background: #991b1b; color: #fca5a5; }
+    .stat-val { font-size: 24px; font-weight: 900; color: #10b981; }
+    pre { font-size: 11px; color: #94a3b8; overflow-x: auto; margin-top: 6px; background: #020617; padding: 8px; border-radius: 6px; }
+    iframe { width: 1px; height: 1px; position: absolute; left: -9999px; }
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src="../travel_dashboard.html"></iframe>
+
+  <h1>🛡️ CERTIFICATION QA : MOTEUR UNIVERSEL & VALIDATION DALLAS</h1>
+  <div class="subtitle">Validation sous Edge Headless de la résolution du problème récurrent "Aucun résultat" via le moteur géodésique universel en 2 temps.</div>
+
+  <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <div style="font-size:12px; color:#94a3b8; font-weight:bold; text-transform:uppercase;">Statut Global Banc d'Essai</div>
+      <div id="globalStatus" class="stat-val">EN COURS D'EXÉCUTION...</div>
+    </div>
+    <div style="text-align:right;">
+      <div id="testCounts" style="font-size:14px; font-weight:bold; color:#cbd5e1;">0 / 0 tests validés</div>
+      <div id="timestamp" style="font-size:11px; color:#64748b;"></div>
+    </div>
+  </div>
+
+  <div id="testsContainer" class="grid"></div>
+
+  <script>
+    const frame = document.getElementById('appFrame');
+    const results = [];
+
+    frame.onload = () => {
+      setTimeout(runScenarios, 1000);
+    };
+
+    function assert(id, title, condition, details) {
+      results.push({ id, title, pass: !!condition, details });
+      renderResults();
+    }
+
+    function renderResults() {
+      const container = document.getElementById('testsContainer');
+      const passCount = results.filter(r => r.pass).length;
+      const totalCount = results.length;
+      const isAllPass = passCount === totalCount && totalCount > 0;
+
+      document.getElementById('testCounts').innerText = `${passCount} / ${totalCount} tests validés`;
+      document.getElementById('timestamp').innerText = new Date().toLocaleTimeString('fr-FR');
+
+      const globalEl = document.getElementById('globalStatus');
+      if (isAllPass) {
+        globalEl.innerText = `✅ 100% PASS (${passCount}/${totalCount})`;
+        globalEl.style.color = '#10b981';
+      } else {
+        globalEl.innerText = `❌ ${totalCount - passCount} ÉCHEC(S)`;
+        globalEl.style.color = '#ef4444';
+      }
+
+      container.innerHTML = results.map(r => `
+        <div class="test-box ${r.pass ? 'pass' : 'fail'}">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-weight:bold; font-size:13px; color:#f8fafc;">${r.id}</span>
+            <span class="badge ${r.pass ? 'badge-pass' : 'badge-fail'}">${r.pass ? 'PASS' : 'FAIL'}</span>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; margin-bottom:4px;">${r.title}</div>
+          <pre>${r.details}</pre>
+        </div>
+      `).join('');
+    }
+
+    async function runScenarios() {
+      const win = frame.contentWindow;
+      const doc = win.document;
+
+      // =========================================================================
+      // SCÉNARIO 1 : RECHERCHE DALLAS (Exacte configuration de Seb : 40-180 €, 2 pers., rayon 5.0 km)
+      // =========================================================================
+      doc.getElementById('destInput').value = 'Dallas';
+      doc.getElementById('minPriceInput').value = '40';
+      doc.getElementById('minPriceRange').value = '40';
+      doc.getElementById('maxPriceInput').value = '180';
+      doc.getElementById('maxPriceRange').value = '180';
+      doc.getElementById('distInput').value = '5.0';
+      doc.getElementById('distRange').value = '5.0';
+      doc.getElementById('guestsInput').value = '2';
+      win.updatePriceBadge();
+      win.updateDistanceBadge();
+      win.renderPlatformCards();
+      await win.searchLiveAccommodations('Dallas');
+      await new Promise(r => setTimeout(r, 500));
+
+      const gridTextDallas = doc.getElementById('liveAccommodationsGrid').innerText;
+      const cardsDallas = Array.from(doc.querySelectorAll('#liveAccommodationsGrid [data-card-price]'));
+      const pricesDallas = cardsDallas.map(el => parseInt(el.getAttribute('data-card-price'), 10));
+
+      const hasDallasHotels = cardsDallas.length > 0;
+      assert('D1_DALLAS_RESULTS_FOUND', 'Dallas (40-180 €, rayon 5.0 km) : Fin définitive du "0 résultat", hébergements réels trouvés', hasDallasHotels, `Nombre d'offres réelles trouvées : ${cardsDallas.length}`);
+
+      const budgetOkDallas = cardsDallas.length > 0 && pricesDallas.every(p => p >= 40 && p <= 180);
+      assert('D2_DALLAS_BUDGET_RESPECT', 'Dallas : 100% des hôtels dans la fourchette de budget 40 à 180 € (Règle 02 & 09)', budgetOkDallas, `Tarifs : ${pricesDallas.join('€, ')}€`);
+
+      const noColombia = !gridTextDallas.includes('Colombia') && !gridTextDallas.includes('Cúcuta') && !gridTextDallas.includes('Brasil');
+      assert('D3_DALLAS_NO_SOUTH_AMERICA', 'Dallas : Éradication totale des faux positifs en Colombie / Brésil (Ancrage géodésique)', noColombia, `Homonymes sud-américains exclus : ${noColombia}`);
+
+      const dallasBookingLinks = Array.from(doc.querySelectorAll('#liveAccommodationsGrid a[href*="booking.com"]')).map(a => a.href);
+      const bookingDallasOk = dallasBookingLinks.length > 0 && dallasBookingLinks.every(l => {
+        const decoded = decodeURIComponent(l);
+        return decoded.includes('Dallas') && !l.includes('dest_type=hotel') && l.includes('group_adults=2') && l.includes('no_rooms=1');
+      });
+      assert('D4_DALLAS_BOOKING_LINKS', 'Dallas : Deep-links Booking ciblent les hôtels de Dallas avec adults=2 sans dest_type', bookingDallasOk, `Échantillon URL : ${dallasBookingLinks[0]?.substring(0, 110)}...`);
+
+      // =========================================================================
+      // SCÉNARIO 2 : TEST MONDIAL UNIVERSEL HORS-BASE — REYKJAVIK (Islande)
+      // =========================================================================
+      doc.getElementById('destInput').value = 'Reykjavik';
+      doc.getElementById('minPriceInput').value = '0';
+      doc.getElementById('maxPriceInput').value = '250';
+      doc.getElementById('maxPriceRange').value = '250';
+      doc.getElementById('distInput').value = '10.0';
+      doc.getElementById('distRange').value = '10.0';
+      win.updatePriceBadge();
+      win.updateDistanceBadge();
+      win.renderPlatformCards();
+      await win.searchLiveAccommodations('Reykjavik');
+      await new Promise(r => setTimeout(r, 500));
+
+      const cardsReyk = Array.from(doc.querySelectorAll('#liveAccommodationsGrid [data-card-price]'));
+      assert('D5_UNIVERSAL_REYKJAVIK', 'Moteur Universel Hors-Base : Résolution dynamique instantanée pour Reykjavik (Islande)', cardsReyk.length > 0, `Hôtels islandais réels trouvés : ${cardsReyk.length}`);
+
+      // =========================================================================
+      // SCÉNARIO 3 : NON-RÉGRESSION ROME (3 pers, max 60 €, rayon 4.0 km)
+      // =========================================================================
+      doc.getElementById('destInput').value = 'Rome';
+      doc.getElementById('minPriceInput').value = '0';
+      doc.getElementById('maxPriceInput').value = '60';
+      doc.getElementById('maxPriceRange').value = '60';
+      doc.getElementById('distInput').value = '4.0';
+      doc.getElementById('distRange').value = '4.0';
+      doc.getElementById('guestsInput').value = '3';
+      win.updatePriceBadge();
+      win.updateDistanceBadge();
+      win.renderPlatformCards();
+      await win.searchLiveAccommodations('Rome');
+
+      const pricesRome = Array.from(doc.querySelectorAll('#liveAccommodationsGrid [data-card-price]')).map(el => parseInt(el.getAttribute('data-card-price'), 10));
+      const romeOk = pricesRome.length >= 4 && pricesRome.every(p => p <= 60);
+      assert('D6_NON_REGRESSION_ROME', 'Non-Régression Rome (3p, max 60€, 4km) : 100% conforme budget', romeOk, `Offres Rome : ${pricesRome.length} (${pricesRome.join('€, ')}€)`);
+
+      // =========================================================================
+      // SCÉNARIO 4 : NON-RÉGRESSION NEW YORK (Central Park, 40-180 €, 2 pers., rayon 6.5 km)
+      // =========================================================================
+      doc.getElementById('destInput').value = 'New York';
+      doc.getElementById('landmarkInput').value = 'Central Park';
+      doc.getElementById('minPriceInput').value = '40';
+      doc.getElementById('maxPriceInput').value = '180';
+      doc.getElementById('distInput').value = '6.5';
+      doc.getElementById('guestsInput').value = '2';
+      win.updatePriceBadge();
+      win.updateDistanceBadge();
+      win.renderPlatformCards();
+      await win.searchLiveAccommodations('New York');
+
+      const gridTextNYC = doc.getElementById('liveAccommodationsGrid').innerText;
+      const noRotterdamInNYC = !gridTextNYC.includes('Rotterdam') && !gridTextNYC.includes('Koninginnenhoofd');
+      assert('D7_NON_REGRESSION_NYC', 'Non-Régression New York : Rotterdam 100% exclu de la recherche New York City', noRotterdamInNYC, `Rotterdam absent : ${noRotterdamInNYC}`);
+
+      // =========================================================================
+      // SCÉNARIO 5 : NON-RÉGRESSION MIAMI (5 pers, max 110 €, rayon 3.0 km)
+      // =========================================================================
+      doc.getElementById('destInput').value = 'Miami';
+      doc.getElementById('minPriceInput').value = '0';
+      doc.getElementById('maxPriceInput').value = '110';
+      doc.getElementById('distInput').value = '3.0';
+      doc.getElementById('guestsInput').value = '5';
+      win.updatePriceBadge();
+      win.updateDistanceBadge();
+      win.renderPlatformCards();
+      await win.searchLiveAccommodations('Miami');
+
+      const gridTextMiami = doc.getElementById('liveAccommodationsGrid').innerText;
+      const miamiSouthBeachExcluded = !gridTextMiami.includes('Freehand Miami') && !gridTextMiami.includes('Generator Miami');
+      assert('D8_NON_REGRESSION_MIAMI', 'Non-Régression Miami (5p, max 110€, 3km) : Rayon strict & exclusion South Beach', miamiSouthBeachExcluded, `South Beach exclu : ${miamiSouthBeachExcluded}`);
+
+      // =========================================================================
+      // SCÉNARIO 6 : COCKPIT DES 10 COMPARATEURS OFFICIELS
+      // =========================================================================
+      const platCount = doc.querySelectorAll('#platformsGrid [data-platform-card]').length;
+      assert('D9_COCKPIT_10_PLATFORMS', 'Cockpit Méta-Recherche : 10 comparateurs officiels 100% connectés', platCount === 10, `Comparateurs : ${platCount} / 10`);
+
+      renderResults();
+    }
+  </script>
+</body>
+</html>

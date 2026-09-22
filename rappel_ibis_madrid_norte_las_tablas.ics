@@ -1,0 +1,41 @@
+﻿BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Antigravity Travel Assistant//FR
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:521cac48-51d3-4cf1-86c1-ee478c048a75@antigravity.travel
+DTSTAMP:20260908T102246Z
+DTSTART;VALUE=DATE:20261029
+DTEND;VALUE=DATE:20261102
+SUMMARY:Voyage : ibis Madrid Norte Las Tablas
+LOCATION:Carretera Fuencarral a Alcobendas, 10, Madrid
+DESCRIPTION:SÃ©jour Ã  ibis Madrid Norte Las Tablas du 2026-10-29 au 2026-11-02.\nTarif : 320 EUR\nAdresse : Carretera Fuencarral a Alcobendas, 10, Madrid
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Rappel dÃ©part demain : sÃ©jour Ã  ibis Madrid Norte Las Tablas
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:73c4d135-867b-47c8-9bbb-c0535e57d0b0@antigravity.travel
+DTSTAMP:20260908T102246Z
+DTSTART:20261027T170000
+DTEND:20261027T180000
+SUMMARY:âš ï¸ DERNIÃˆRE LIMITE Annulation Gratuite : ibis Madrid Norte Las Tablas
+LOCATION:Carretera Fuencarral a Alcobendas, 10, Madrid
+DESCRIPTION:Dernier dÃ©lai pour annuler la rÃ©servation sans frais pour ibis Madrid Norte Las Tablas !\nHeure limite : 2026-10-27T18:00:00
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-PT24H
+ACTION:DISPLAY
+DESCRIPTION:ALERTE : Annulation gratuite ibis Madrid Norte Las Tablas expire dans 24 heures !
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-PT2H
+ACTION:DISPLAY
+DESCRIPTION:URGENT : Annulation gratuite ibis Madrid Norte Las Tablas expire dans 2 heures !
+END:VALARM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Banc d'Essai AUD : Phase Commerciale, Multi-Devises & PWA</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; }
+    h1 { color: #38bdf8; font-size: 22px; margin-bottom: 8px; }
+    pre { background: #020617; border: 1px solid #1e293b; padding: 14px; border-radius: 10px; font-size: 12px; color: #e2e8f0; line-height: 1.5; }
+    .card-preview { background: #ffffff; color: #1e293b; border-radius: 14px; padding: 12px; max-width: 380px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body>
+  <h1>🧪 Banc d'Essai AUD : Commercialisation, Multi-Devises & PWA TravelLingo Pro</h1>
+  <pre id="output"></pre>
+  
+  <div style="margin-top: 15px; display: flex; gap: 16px; flex-wrap: wrap;">
+    <div id="previewUSD" class="card-preview"></div>
+    <div id="previewCAD" class="card-preview"></div>
+    <div id="previewJPY" class="card-preview"></div>
+  </div>
+
+  <iframe id="dashFrame" src="file:///C:/Users/EFFICIENS%20ENERGIA/.gemini/antigravity/brain/f076e0be-08ee-48cc-9303-5a3edb1e0506/travel_dashboard.html" style="width: 1200px; height: 900px; border: 2px solid #334155; border-radius: 12px; margin-top: 20px; background: white;"></iframe>
+
+  <script>
+    const frame = document.getElementById('dashFrame');
+    const out = document.getElementById('output');
+    const log = (msg) => { out.textContent += msg + '\n'; };
+
+    frame.onload = async function() {
+      setTimeout(async function() {
+        try {
+          const win = frame.contentWindow;
+          const doc = frame.contentDocument;
+
+          log("==========================================================================");
+          log(" BANC D'ESSAI AUD CERTIFIÉ : PHASE COMMERCIALE, MULTI-DEVISES & PWA");
+          log("==========================================================================");
+
+          // ----------------------------------------------------------------------
+          // TEST 1 : Architecture PWA, Manifest W3C & Bouton d'Installation
+          // ----------------------------------------------------------------------
+          log("\n--- TEST 1 : Architecture PWA, Manifest W3C & Bouton Installateur ---");
+          const manifestLink = doc.querySelector('link[rel="manifest"]');
+          const themeMeta = doc.querySelector('meta[name="theme-color"]');
+          const appleIcon = doc.querySelector('link[rel="apple-touch-icon"]');
+          const btnInstall = doc.getElementById('btnInstallPwa');
+
+          const hasManifest = manifestLink && manifestLink.getAttribute('href') === 'manifest.webmanifest';
+          const hasTheme = themeMeta && themeMeta.getAttribute('content') === '#58cc02';
+          const hasIcon = appleIcon && appleIcon.getAttribute('href') === 'icon-192.svg';
+          const hasBtnInstall = !!btnInstall;
+
+          log(`Manifest Web App : ${hasManifest ? 'Présent & conforme (manifest.webmanifest) ✅' : 'ÉCHEC ❌'}`);
+          log(`Theme Color PWA : ${hasTheme ? '#58cc02 (Vert Duolingo) ✅' : 'ÉCHEC ❌'}`);
+          log(`Icône PWA Apple / Android : ${hasIcon ? 'icon-192.svg ✅' : 'ÉCHEC ❌'}`);
+          log(`Bouton Installateur PWA : ${hasBtnInstall ? 'Intégré au header ✅' : 'ÉCHEC ❌'}`);
+          const test1Ok = hasManifest && hasTheme && hasIcon && hasBtnInstall;
+          log(`Résultat Test 1 (PWA) : ${test1Ok ? 'RÉUSSI (4/4) ✅' : 'ÉCHEC ❌'}`);
+
+          // ----------------------------------------------------------------------
+          // TEST 2 : Convertisseur Multi-Devises Intelligent & Universel
+          // ----------------------------------------------------------------------
+          log("\n--- TEST 2 : Système Multi-Devises Intelligent (EUR, USD, GBP, CAD, JPY, CHF) ---");
+          
+          // Test USD
+          win.setUserCurrency('USD', false);
+          const usdPriceStr = win.formatCurrencyPrice(120, true);
+          log(`Test conversion 120 € en USD : ${usdPriceStr}`);
+          const isUsdOk = usdPriceStr.includes('$') && usdPriceStr.includes('≈ 120 €');
+
+          // Test CAD sur Montréal
+          win.detectAndSuggestCurrencyForDest('Montréal');
+          const isCadAuto = win.USER_CURRENCY === 'CAD';
+          const cadPriceStr = win.formatCurrencyPrice(120, true);
+          log(`Détection automatique Montréal -> CAD : ${isCadAuto ? 'OUI ✅' : 'NON ❌'} (${cadPriceStr})`);
+
+          // Test JPY sur Tokyo
+          win.detectAndSuggestCurrencyForDest('Tokyo');
+          const isJpyAuto = win.USER_CURRENCY === 'JPY';
+          const jpyPriceStr = win.formatCurrencyPrice(120, true);
+          log(`Détection automatique Tokyo -> JPY : ${isJpyAuto ? 'OUI ✅' : 'NON ❌'} (${jpyPriceStr})`);
+
+          // Test GBP sur Londres
+          win.detectAndSuggestCurrencyForDest('Londres');
+          const isGbpAuto = win.USER_CURRENCY === 'GBP';
+          log(`Détection automatique Londres -> GBP : ${isGbpAuto ? 'OUI ✅' : 'NON ❌'}`);
+
+          // Rétablissement EUR
+          win.setUserCurrency('EUR', true);
+          const eurPriceStr = win.formatCurrencyPrice(120, true);
+          log(`Rétablissement Zone Euro (EUR) : ${win.USER_CURRENCY === 'EUR' ? 'OUI ✅' : 'NON ❌'} (${eurPriceStr})`);
+
+          const test2Ok = isUsdOk && isCadAuto && isJpyAuto && isGbpAuto && (win.USER_CURRENCY === 'EUR');
+          log(`Résultat Test 2 (Multi-Devises) : ${test2Ok ? 'RÉUSSI (5/5) ✅' : 'ÉCHEC ❌'}`);
+
+          // ----------------------------------------------------------------------
+          // TEST 3 : Auto-complétion Prédictive Mondiale (Photon OSM & Fallback)
+          // ----------------------------------------------------------------------
+          log("\n--- TEST 3 : Auto-complétion Prédictive Mondiale en Direct ---");
+          const mockFeatures = [
+            { properties: { name: "Séville", city: "Séville", state: "Andalousie", country: "Espagne", osm_key: "place", osm_value: "city" }, geometry: { coordinates: [-5.9845, 37.3891] } },
+            { properties: { name: "Tour de Belém", city: "Lisbonne", state: "Lisboa", country: "Portugal", osm_key: "tourism", osm_value: "attraction" }, geometry: { coordinates: [-9.2160, 38.6916] } }
+          ];
+
+          win.renderAutocompleteSuggestions(mockFeatures, 'dest', 'Sév');
+          const destDropdown = doc.getElementById('destSuggestionsDropdown');
+          const itemsCount = destDropdown ? destDropdown.querySelectorAll('.autocomplete-item').length : 0;
+          const dropdownVisible = destDropdown && !destDropdown.classList.contains('hidden');
+          log(`Éléments d'auto-complétion rendus : ${itemsCount} items`);
+          log(`Visibilité du dropdown : ${dropdownVisible ? 'Affiché ✅' : 'Masqué ❌'}`);
+
+          // Sélection de l'item 0 (Séville)
+          win.selectAutocompleteItem('dest', 0);
+          const selectedDest = doc.getElementById('destInput')?.value;
+          const dropdownClosed = destDropdown && destDropdown.classList.contains('hidden');
+          log(`Destination sélectionnée : ${selectedDest}`);
+          log(`Fermeture automatique du menu après clic : ${dropdownClosed ? 'OUI ✅' : 'NON ❌'}`);
+
+          const test3Ok = (itemsCount === 2) && dropdownVisible && (selectedDest === 'Séville') && dropdownClosed;
+          log(`Résultat Test 3 (Auto-complétion Mondiale) : ${test3Ok ? 'RÉUSSI (4/4) ✅' : 'ÉCHEC ❌'}`);
+
+          // ----------------------------------------------------------------------
+          // TEST 4 : Zéro Régression - 40 Offres, GPS Maps & Top 1 Coût/Prestation
+          // ----------------------------------------------------------------------
+          log("\n--- TEST 4 : Zéro Régression (10 Plateformes, GPS & Top 1 Coût/Prestation) ---");
+          const sevilleOffers = win.getPlatformTop4Listings('googletravel', 'Séville', '2026-10-15', '2026-10-18', '2', 0, 180, 'Plaza de España', 2.0);
+          const top1Sev = sevilleOffers[0];
+          log(`Top 1 Séville : ${top1Sev.name} (${win.formatCurrencyPrice(top1Sev.price, false)}/n)`);
+          log(`GPS : lat=${top1Sev.lat}, lon=${top1Sev.lon}`);
+          log(`Distance : ${top1Sev.distText}`);
+          log(`Top 1 Coût & Prestation 💎 : ${top1Sev.isTopValuePick ? 'CONFIRMÉ ✅' : 'MANQUANT ❌'}`);
+
+          const test4Ok = (top1Sev.lat !== undefined && top1Sev.lon !== undefined && top1Sev.isTopValuePick && top1Sev.realDistKm <= 2.0);
+          log(`Résultat Test 4 (Zéro Régression) : ${test4Ok ? 'RÉUSSI ✅' : 'ÉCHEC ❌'}`);
+
+          // ----------------------------------------------------------------------
+          // TEST 5 : Persistance Continue LocalStorage (Préférences & Devises)
+          // ----------------------------------------------------------------------
+          log("\n--- TEST 5 : Persistance Continue LocalStorage ---");
+          win.setUserCurrency('USD', true);
+          const savedRaw = localStorage.getItem('travelhub_duo_prefs');
+          const savedPrefs = savedRaw ? JSON.parse(savedRaw) : {};
+          const isCurrencyPersisted = (savedPrefs.currency === 'USD');
+          log(`Devise persistée dans localStorage : ${savedPrefs.currency}`);
+          win.setUserCurrency('EUR', true);
+
+          const test5Ok = isCurrencyPersisted;
+          log(`Résultat Test 5 (Persistance LocalStorage) : ${test5Ok ? 'RÉUSSI ✅' : 'ÉCHEC ❌'}`);
+
+          // Injection aperçu visuel des devises pour la capture d'écran
+          const cardPreviewUsd = doc.getElementById('previewUSD') || document.getElementById('previewUSD');
+          if (cardPreviewUsd) {
+            win.setUserCurrency('USD', false);
+            cardPreviewUsd.innerHTML = `
+              <div style="font-weight:900; font-size:12px; color:#1e40af; margin-bottom:4px;">💵 APERÇU DEVISE : USD $</div>
+              <div style="font-size:11px; font-weight:800;">${top1Sev.name}</div>
+              <div style="font-size:14px; font-weight:900; color:#047857; margin-top:4px;">${win.formatCurrencyPrice(top1Sev.price, true)}</div>
+            `;
+          }
+          const cardPreviewCad = doc.getElementById('previewCAD') || document.getElementById('previewCAD');
+          if (cardPreviewCad) {
+            win.setUserCurrency('CAD', false);
+            cardPreviewCad.innerHTML = `
+              <div style="font-weight:900; font-size:12px; color:#b45309; margin-bottom:4px;">🍁 APERÇU DEVISE : CAD $</div>
+              <div style="font-size:11px; font-weight:800;">${top1Sev.name}</div>
+              <div style="font-size:14px; font-weight:900; color:#047857; margin-top:4px;">${win.formatCurrencyPrice(top1Sev.price, true)}</div>
+            `;
+          }
+          const cardPreviewJpy = doc.getElementById('previewJPY') || document.getElementById('previewJPY');
+          if (cardPreviewJpy) {
+            win.setUserCurrency('JPY', false);
+            cardPreviewJpy.innerHTML = `
+              <div style="font-weight:900; font-size:12px; color:#7c3aed; margin-bottom:4px;">💴 APERÇU DEVISE : JPY ¥</div>
+              <div style="font-size:11px; font-weight:800;">${top1Sev.name}</div>
+              <div style="font-size:14px; font-weight:900; color:#047857; margin-top:4px;">${win.formatCurrencyPrice(top1Sev.price, true)}</div>
+            `;
+            win.setUserCurrency('EUR', true);
+          }
+
+          log("\n==========================================================================");
+          const allPass = test1Ok && test2Ok && test3Ok && test4Ok && test5Ok;
+          log(` BILAN AUD FINAL : ${allPass ? 'TOUS LES TESTS SONT AU VERT (5/5 PASS) 🏆' : 'ÉCHEC DÉTECTÉ ⚠️'}`);
+          log("==========================================================================");
+
+        } catch(err) {
+          log("\nERREUR D'EXÉCUTION DU TEST : " + err.message + "\n" + err.stack);
+        }
+      }, 500);
+    };
+  </script>
+</body>
+</html>

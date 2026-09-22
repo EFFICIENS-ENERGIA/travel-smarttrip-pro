@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }</style>
+</head>
+<body>
+  <iframe id="f" src="../travel_dashboard.html" style="width:1440px; height:1050px; border:none;"></iframe>
+  <script>
+    const f = document.getElementById('f');
+    f.onload = () => {
+      setTimeout(() => {
+        const win = f.contentWindow;
+        const doc = f.contentDocument;
+        try {
+          const destEl = doc.getElementById('destInput');
+          if (destEl) {
+            destEl.value = 'Tokyo, Japon';
+            if (win.onCriteriaChanged) win.onCriteriaChanged();
+            if (win.renderPlatformCards) win.renderPlatformCards();
+          }
+          const offers = win.getPlatformTop4Listings('googletravel', 'Tokyo', '2026-10-15', '2026-10-18', 2, 60, 250, 'Shinjuku', 3);
+          if (offers && offers.length > 0) {
+            win.openHotelDetailModal(offers[0]);
+          }
+        } catch(e) {
+          console.error(e);
+        }
+      }, 800);
+    };
+  </script>
+</body>
+</html>

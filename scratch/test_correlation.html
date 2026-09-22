@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Test CorrÃ©lation Recherche</title></head>
+<body>
+  <iframe id="appFrame" src="../travel_dashboard.html" style="width:1200px; height:800px;"></iframe>
+  <div id="status">En cours...</div>
+  <script>
+    const iframe = document.getElementById('appFrame');
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          const win = iframe.contentWindow;
+          const doc = iframe.contentDocument;
+          const errors = [];
+
+          // 1. VÃ©rifier que le champ landmark est bien VIDE Ã  l'initialisation
+          const landmarkVal = doc.getElementById('landmarkInput').value;
+          if (landmarkVal !== '') {
+            errors.push("Le champ landmark n'est pas vide par dÃ©faut : '" + landmarkVal + "'");
+          }
+
+          // 2. Tester une recherche sur Bordeaux
+          win.setDest('Bordeaux');
+          const cardsBordeaux = doc.querySelectorAll('#platformsGrid .card-duo');
+          if (cardsBordeaux.length === 0) {
+            errors.push("Aucune carte de comparateur affichÃ©e pour Bordeaux");
+          }
+          const bordeauxAllText = Array.from(cardsBordeaux).map(c => c.innerText).join(' ');
+          if (!bordeauxAllText.toLowerCase().includes('bordeaux')) {
+            errors.push("Bordeaux n'est pas mentionnÃ© dans les cartes");
+          }
+          if (bordeauxAllText.includes('ColisÃ©e')) {
+            errors.push("Ancre parasite ColisÃ©e dÃ©tectÃ©e dans Bordeaux !");
+          }
+
+          // 3. Tester une recherche sur SÃ©ville (nouvelle mÃ©tropole CURATED)
+          win.setDest('SÃ©ville');
+          const cardsSeville = doc.querySelectorAll('#platformsGrid .card-duo');
+          const sevilleAllText = Array.from(cardsSeville).map(c => c.innerText).join(' ');
+          const hasSeville = sevilleAllText.toLowerCase().includes('sÃ©ville') || 
+                            sevilleAllText.toLowerCase().includes('seville') || 
+                            sevilleAllText.includes('Alfonso XIII') || 
+                            sevilleAllText.includes('Giralda');
+          if (!hasSeville) {
+            errors.push("La recherche SÃ©ville n'affiche pas SÃ©ville ou ses hÃ´tels rÃ©els");
+          }
+
+          // 4. Tester une recherche libre (Quimper) pour vÃ©rifier le repli rÃ©silient
+          doc.getElementById('destInput').value = 'Quimper';
+          win.executeSearch();
+          const cardsQuimper = doc.querySelectorAll('#platformsGrid .card-duo');
+          if (cardsQuimper.length !== 10) {
+            errors.push("Repli Quimper doit avoir 10 comparateurs (obtenu: " + cardsQuimper.length + ")");
+          }
+          let bkgLinkQuimper = null;
+          doc.querySelectorAll('#platformsGrid a.btn-3d-blue').forEach(a => {
+            if (a.href.includes('booking.com')) bkgLinkQuimper = a.href;
+          });
+          if (!bkgLinkQuimper || !bkgLinkQuimper.includes('ss=Quimper')) {
+            errors.push("Deep link Booking pour Quimper ne cible pas ss=Quimper : " + bkgLinkQuimper);
+          }
+
+          if (errors.length === 0) {
+            document.getElementById('status').innerText = "SUCCESS: 100% CORRÃ‰LATION VALIDÃ‰E (Bordeaux, SÃ©ville, Quimper, ancre ColisÃ©e Ã©radiquÃ©e)";
+            window.__TEST_SUCCESS__ = true;
+          } else {
+            document.getElementById('status').innerText = "FAIL: " + errors.join(" | ");
+            window.__TEST_SUCCESS__ = false;
+          }
+        } catch(ex) {
+          document.getElementById('status').innerText = "EXCEPTION: " + ex.message;
+        }
+      }, 1500);
+    };
+  </script>
+</body>
+</html>
