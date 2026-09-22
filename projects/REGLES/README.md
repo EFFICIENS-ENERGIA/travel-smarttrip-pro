@@ -40,6 +40,10 @@ Ce dossier formalise et verrouille les standards que **chaque agent doit scrupul
 | **17** | [`17_STANDARD_UNIVERSEL_NEXTJS_SUPABASE_SSR_MIDDLEWARE.md`](./17_STANDARD_UNIVERSEL_NEXTJS_SUPABASE_SSR_MIDDLEWARE.md) | **Standard universel Next.js SSR & Supabase Middleware** | Architecture Next.js App Router obligatoire : `@supabase/ssr`, `zod`, `middleware.ts`, `utils/supabase/` (client, server, middleware), isolation RLS PostgreSQL. |
 | **18** | [`18_AUTHENTIFICATION_SECURISEE_OAUTH_MAGICLINKS_PKCE.md`](./18_AUTHENTIFICATION_SECURISEE_OAUTH_MAGICLINKS_PKCE.md) | **Authentification sécurisée PKCE, OAuth & Magic Links** | Flux PKCE complet via `app/auth/callback/route.ts`, `exchangeCodeForSession`, gestion des en-têtes `x-forwarded-host`, redirection sécurisée avec paramètre `?next=`. |
 | **19** | [`19_STANDARD_BASCULE_AUTOMATIQUE_GITHUB_ET_SUPABASE.md`](./19_STANDARD_BASCULE_AUTOMATIQUE_GITHUB_ET_SUPABASE.md) | **Bascule automatique GitHub & Supabase SSR (Projets Actuels & Futurs)** | Obligation absolue d'initialisation et synchronisation automatique de TOUT projet existant ou futur vers l'organisation GitHub `EFFICIENS-ENERGIA` et Supabase Cloud SSR. Script universel 1-clic `NOUVEAU_PROJET.bat`. |
+| **20** | [`20_STANDARD_UIX_FAIL_HONEST_ET_ACCESSIBILITE.md`](./20_STANDARD_UIX_FAIL_HONEST_ET_ACCESSIBILITE.md) | **Standard UI/UX États Vides Fail-Honest & Accessibilité ARIA** | Matérialisation visuelle de l'absence de résultat : diagnostic sans hallucination, méta-recherche externe 1-clic et modales accessibles WCAG AA. |
+
+> [!TIP]
+> **Index Synthétique Rapide (Gain 70% Tokens)** : Consultez [`RULES_INDEX.md`](./RULES_INDEX.md) pour la grille de référence ultra-compacte des 21 règles avec leurs contraintes dures et codes d'erreurs associés.
 
 ---
 
