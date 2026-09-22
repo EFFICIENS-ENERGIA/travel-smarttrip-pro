@@ -1,4 +1,4 @@
-﻿# ⚡ INDEX SYNTHÉTIQUE DES RÈGLES ANTIGRAVITY (RULES_INDEX.md)
+# ⚡ INDEX SYNTHÉTIQUE DES RÈGLES ANTIGRAVITY (RULES_INDEX.md)
 > **Guide d'application rapide & Lazy Loading (Gain : ~70% de tokens)**  
 > **Commanditaire :** Seb (Manager / Product Owner) | **Coordination :** @CE  
 > **Application :** Pour toute consultation rapide ou injection de contexte compact dans les sous-agents.
@@ -24,6 +24,7 @@
 | **18** | Authentification PKCE & OAuth | ACTIVE | WEB CLOUD | Échange de session sécurisé `app/auth/callback/route.ts`, redirection `?next=`. | `ERR_18_PKCE_AUTH` | [`18_...md`](./18_AUTHENTIFICATION_SECURISEE_OAUTH_MAGICLINKS_PKCE.md) |
 | **19** | Bascule Automatique GitHub | ACTIVE | UNIVERSEL | Dépôt sur `EFFICIENS-ENERGIA`, architecture SSR injectée, validation pré-push. | `ERR_19_GITHUB_AUTO` | [`19_...md`](./19_STANDARD_BASCULE_AUTOMATIQUE_GITHUB_ET_SUPABASE.md) |
 | **20** | Fail-Honest State & ARIA | ACTIVE | UI / UX | Composant accessible pour états vides avec méta-recherche réelle et modales WCAG. | `ERR_20_FAIL_HONEST` | [`20_...md`](./20_STANDARD_UIX_FAIL_HONEST_ET_ACCESSIBILITE.md) |
+| **21** | Initialisation & Config Automatique | ACTIVE | UNIVERSEL | .cursorrules, OAuth 2.0, modèles emails, SQL unifié, formulaires UI et GitHub auto. | `ERR_21_CONFIG_AUTO` | [`21_...md`](./21_DIRECTIVES_INITIALISATION_CONFIGURATION_AUTOMATIQUE.md) |
 
 ---
 

@@ -83,8 +83,10 @@ Tout agent (`CE`, `DEV`, `AUD`, `UIX`, `OPS`, `DOC`) intervenant sur le projet d
     Obligation absolue d'initialisation et synchronisation automatique de TOUT projet existant ou futur vers l'organisation GitHub `EFFICIENS-ENERGIA` et Supabase Cloud SSR. Script universel 1-clic `NOUVEAU_PROJET.bat`.
 20. **Règle 20 — Standard UI/UX États Vides Fail-Honest & Accessibilité ARIA** ([`20_STANDARD_UIX_FAIL_HONEST_ET_ACCESSIBILITE.md`](file:///c:/Users/EFFICIENS%20ENERGIA/Desktop/ANTIGRAVITY/$HOMEagy2-projectsmy-first-project/REGLES/20_STANDARD_UIX_FAIL_HONEST_ET_ACCESSIBILITE.md)) :
     Matérialisation visuelle de l'absence de résultat : diagnostic sans hallucination, méta-recherche externe 1-clic et modales accessibles WCAG AA.
+21. **Règle 21 — Directives d'Initialisation & Configuration Automatique Complète** ([`21_DIRECTIVES_INITIALISATION_CONFIGURATION_AUTOMATIQUE.md`](file:///c:/Users/EFFICIENS%20ENERGIA/Desktop/ANTIGRAVITY/$HOMEagy2-projectsmy-first-project/REGLES/21_DIRECTIVES_INITIALISATION_CONFIGURATION_AUTOMATIQUE.md)) :
+    .cursorrules universel, guide OAuth 2.0 Google Cloud, modèles HTML emails, script SQL unifié (profiles, RLS, trigger, bucket avatars), formulaires UI complets et publication GitHub auto.
 > [!TIP]
-> **Index Synthétique Rapide (Gain 70% Tokens)** : Utilisez [`RULES_INDEX.md`](file:///c:/Users/EFFICIENS%20ENERGIA/Desktop/ANTIGRAVITY/$HOMEagy2-projectsmy-first-project/REGLES/RULES_INDEX.md) pour la grille de référence compacte des 21 règles (*Lazy Loading*).
+> **Index Synthétique Rapide (Gain 70% Tokens)** : Utilisez [`RULES_INDEX.md`](file:///c:/Users/EFFICIENS%20ENERGIA/Desktop/ANTIGRAVITY/$HOMEagy2-projectsmy-first-project/REGLES/RULES_INDEX.md) pour la grille de référence compacte des 22 règles (*Lazy Loading*).
 
 ---
 
